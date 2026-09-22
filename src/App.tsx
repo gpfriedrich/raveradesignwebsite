@@ -122,6 +122,8 @@ function App() {
 
 export default function RoutedApp() {
   const path = window.location.pathname.replace(/\/+$/, '')
+  if (path === '/landing1/catalogo') return <RaveraLanding direction={1} view="catalog" />
+  if (path.startsWith('/landing1/catalogo/')) return <RaveraLanding direction={1} view="product" productSlug={path.split('/').pop()} />
   if (path === '/landing1') return <RaveraLanding direction={1} />
   if (path === '/landing2') return <RaveraLanding direction={2} />
   if (path === '/landing3') return <RaveraLanding direction={3} />
