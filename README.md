@@ -4,7 +4,7 @@ Três direções visuais independentes no aplicativo React/Vite:
 
 - `/landing1` — editorial minimalista
 - `/landing2` — narrativa orgânica
-- `/landing3` — galeria contemporânea
+- `/landing3` — tempo suspenso (código isolado em `src/landing3/`)
 
 A rota `/` continua com a página inicial que já existia no projeto.
 O build gera arquivos HTML próprios em `dist/landing1/`, `dist/landing2/` e `dist/landing3/` para acesso direto em hospedagem estática.
