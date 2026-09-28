@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { RAVERA_FONTS_URL, RaveraLogo as LandingThreeLogo } from './landing3/LandingThree'
 import './RaveraLandings.css'
 
 type Direction = 1 | 2 | 3
@@ -66,16 +67,7 @@ const products = [
 ]
 
 const instagram = 'https://www.instagram.com/ravera.designn/'
-
-type CatalogDocument = {
-  title: string
-  file: string
-  cover?: string
-}
-
-// Add only official catalog files here. The identity PDFs in the source folder
-// are brand sheets, not commercial catalogs, so they are intentionally omitted.
-const landingTwoCatalogs: CatalogDocument[] = []
+const catalogHref = '/landing1/catalogo'
 
 function BrandMark({ tone, className = '', decorative = true, eager = true }: { tone: keyof typeof logo; className?: string; decorative?: boolean; eager?: boolean }) {
   return (
@@ -283,8 +275,24 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
 
 function DirectionTwo() {
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
+  const [activeSection, setActiveSection] = useState('')
+  const rootRef = useRef<HTMLDivElement>(null)
+  const scrollSentinelRef = useRef<HTMLSpanElement>(null)
   const menuRef = useRef<HTMLElement>(null)
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (document.querySelector('link[data-ts-fonts]')) return
+
+    const fonts = document.createElement('link')
+    fonts.rel = 'stylesheet'
+    fonts.href = RAVERA_FONTS_URL
+    fonts.dataset.tsFonts = ''
+    document.head.append(fonts)
+
+    return () => fonts.remove()
+  }, [])
 
   useEffect(() => {
     const hash = window.location.hash
@@ -297,6 +305,74 @@ function DirectionTwo() {
     document.documentElement.style.scrollBehavior = 'auto'
     target.scrollIntoView({ block: 'start' })
     document.documentElement.style.scrollBehavior = previousBehavior
+  }, [])
+
+  useEffect(() => {
+    const sentinel = scrollSentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsScrolled(!entry.isIntersecting),
+      { threshold: 0 },
+    )
+
+    observer.observe(sentinel)
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const root = rootRef.current
+    if (!root) return
+
+    const elements = Array.from(root.querySelectorAll<HTMLElement>('[data-reveal]'))
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    if (reduceMotion) {
+      elements.forEach((element) => element.classList.add('is-visible'))
+      return
+    }
+
+    const viewportLimit = window.innerHeight * .96
+    elements.forEach((element) => {
+      const bounds = element.getBoundingClientRect()
+      if (bounds.top < viewportLimit && bounds.bottom > 0) element.classList.add('is-visible')
+    })
+    root.classList.add('rv2-motion-ready')
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return
+          entry.target.classList.add('is-visible')
+          observer.unobserve(entry.target)
+        })
+      },
+      { rootMargin: '0px 0px -10% 0px', threshold: .12 },
+    )
+
+    elements.forEach((element) => {
+      if (!element.classList.contains('is-visible')) observer.observe(element)
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const sectionIds = ['historia', 'pecas', 'eternizacao', 'materia', 'criacao', 'catalogos', 'contato']
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter((section): section is HTMLElement => Boolean(section))
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const current = entries.find((entry) => entry.isIntersecting)
+        if (current) setActiveSection(current.target.id)
+      },
+      { rootMargin: '-22% 0px -68% 0px', threshold: 0 },
+    )
+
+    sections.forEach((section) => observer.observe(section))
+    return () => observer.disconnect()
   }, [])
 
   useEffect(() => {
@@ -336,6 +412,16 @@ function DirectionTwo() {
     }
   }, [menuOpen])
 
+  useEffect(() => {
+    const desktopQuery = window.matchMedia('(min-width: 901px)')
+    const closeOnDesktop = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false)
+    }
+
+    desktopQuery.addEventListener('change', closeOnDesktop)
+    return () => desktopQuery.removeEventListener('change', closeOnDesktop)
+  }, [])
+
   const closeMenu = () => setMenuOpen(false)
   const closeMenuAndRestoreFocus = () => {
     setMenuOpen(false)
@@ -343,20 +429,21 @@ function DirectionTwo() {
   }
 
   return (
-    <div className="ravera rv-two" id="topo">
+    <div className="ravera rv-two" id="topo" ref={rootRef}>
       <a className="rv-skip" href="#conteudo">Pular para o conteúdo</a>
-      <header className="rv2-header">
+      <span className="rv2-scroll-sentinel" ref={scrollSentinelRef} aria-hidden="true" />
+      <header className={`rv2-header${isScrolled ? ' is-scrolled' : ''}`}>
         <div className="rv2-header-inner rv-container">
           <a className="rv2-brand" href="#topo" aria-label="RAVERA, início">
-            <BrandMark tone="taupe" decorative={false} eager />
+            <LandingThreeLogo />
           </a>
           <nav className="rv2-desktop-nav" aria-label="Navegação principal">
-            <a href="#pecas">Peças</a>
-            <a href="#eternizacao">Eternização</a>
-            <a href="#catalogos">Catálogos</a>
-            <a href="#historia">Sobre</a>
+            <a href="#pecas" aria-current={activeSection === 'pecas' ? 'location' : undefined}>Peças</a>
+            <a href="#eternizacao" aria-current={activeSection === 'eternizacao' ? 'location' : undefined}>Eternização</a>
+            <a href={catalogHref}>Catálogo</a>
+            <a href="#historia" aria-current={activeSection === 'historia' ? 'location' : undefined}>Sobre</a>
           </nav>
-          <a className="rv2-header-contact" href="#contato">Contato <span aria-hidden="true">↗</span></a>
+          <a className="rv2-header-contact" href="#contato" aria-current={activeSection === 'contato' ? 'location' : undefined}>Contato <span aria-hidden="true">↗</span></a>
           <button
             className="rv2-menu-button"
             type="button"
@@ -375,19 +462,23 @@ function DirectionTwo() {
         <button className="rv2-menu-backdrop" type="button" aria-label="Fechar menu" onClick={closeMenuAndRestoreFocus} tabIndex={menuOpen ? 0 : -1} />
         <nav id="rv2-mobile-menu" className="rv2-mobile-menu" aria-label="Navegação móvel" ref={menuRef} inert={!menuOpen}>
           <button className="rv2-menu-close" type="button" onClick={closeMenuAndRestoreFocus} aria-label="Fechar menu"><span aria-hidden="true">×</span></button>
-          <p>RAVERA <span>Peças Autorais de Design</span></p>
+          <div className="rv2-mobile-brand">
+            <a href="#topo" onClick={closeMenu} aria-label="RAVERA, início">
+              <LandingThreeLogo />
+            </a>
+          </div>
           <a href="#topo" onClick={closeMenu}>Início</a>
-          <a href="#pecas" onClick={closeMenu}>Peças</a>
-          <a href="#eternizacao" onClick={closeMenu}>Eternização</a>
-          <a href="#catalogos" onClick={closeMenu}>Catálogos</a>
-          <a href="#historia" onClick={closeMenu}>Sobre</a>
-          <a href="#contato" onClick={closeMenu}>Contato</a>
+          <a href="#pecas" onClick={closeMenu} aria-current={activeSection === 'pecas' ? 'location' : undefined}>Peças</a>
+          <a href="#eternizacao" onClick={closeMenu} aria-current={activeSection === 'eternizacao' ? 'location' : undefined}>Eternização</a>
+          <a href={catalogHref} onClick={closeMenu}>Catálogo</a>
+          <a href="#historia" onClick={closeMenu} aria-current={activeSection === 'historia' ? 'location' : undefined}>Sobre</a>
+          <a href="#contato" onClick={closeMenu} aria-current={activeSection === 'contato' ? 'location' : undefined}>Contato</a>
           <a className="rv2-mobile-instagram" href={instagram} target="_blank" rel="noopener noreferrer" onClick={closeMenu}>Instagram <span aria-hidden="true">↗</span></a>
         </nav>
       </div>
       <main id="conteudo">
         <section className="rv2-hero rv-container" aria-labelledby="rv2-title">
-          <div className="rv2-hero-copy">
+          <div className="rv2-hero-copy rv2-hero-intro">
             <p className="rv-kicker">Peças Autorais de Design</p>
             <h1 id="rv2-title">Há histórias que merecem <em>permanecer.</em></h1>
             <p>Objetos autorais que aproximam design, afeto e aquilo que escolhemos guardar.</p>
@@ -396,7 +487,7 @@ function DirectionTwo() {
               <a className="rv2-quiet-link" href="#eternizacao">Conheça a eternização</a>
             </div>
           </div>
-          <figure className="rv2-hero-art">
+          <figure className="rv2-hero-art rv2-hero-intro rv2-hero-intro-delay">
             <div className="rv2-arch">
               <img
                 src="/ravera/instagram/porta-joias-personalizado.jpeg"
@@ -413,7 +504,7 @@ function DirectionTwo() {
 
         <section id="historia" className="rv2-story" aria-labelledby="rv2-story-title">
           <div className="rv2-story-inner rv-container">
-            <figure className="rv2-story-image">
+            <figure className="rv2-story-image" data-reveal="image">
               <img
                 src="/ravera/instagram/marcadores-claros.jpeg"
                 width="1600"
@@ -423,7 +514,7 @@ function DirectionTwo() {
                 decoding="async"
               />
             </figure>
-            <div className="rv2-story-copy">
+            <div className="rv2-story-copy" data-reveal="content">
               <p className="rv-kicker">Nossa essência</p>
               <h2 id="rv2-story-title">O valor de uma peça também vive naquilo que ela evoca.</h2>
               <p>Na RAVERA, design autoral e memória dividem o mesmo espaço. Cada criação convida a reconhecer significado nas formas que permanecem por perto.</p>
@@ -433,7 +524,7 @@ function DirectionTwo() {
         </section>
 
         <section id="pecas" className="rv2-pieces rv-container" aria-labelledby="rv2-pieces-title">
-          <div className="rv2-section-heading">
+          <div className="rv2-section-heading" data-reveal="content">
             <div>
               <p className="rv-kicker">Peças em destaque</p>
               <h2 id="rv2-pieces-title">Objetos que guardam presença.</h2>
@@ -441,7 +532,7 @@ function DirectionTwo() {
             <p>Uma seleção real do universo RAVERA, entre peças para a casa e pequenos objetos afetivos.</p>
           </div>
           <div className="rv2-piece-grid">
-            <article className="rv2-piece rv2-piece-primary">
+            <article className="rv2-piece rv2-piece-primary" data-reveal="card">
               <div className="rv2-piece-image">
                 <img
                   src="/ravera/instagram/porta-tacas-mesa.jpeg"
@@ -454,7 +545,7 @@ function DirectionTwo() {
               </div>
               <div className="rv2-piece-meta"><h3>Porta-taças</h3><span>Transparência e cor</span></div>
             </article>
-            <article className="rv2-piece rv2-piece-square">
+            <article className="rv2-piece rv2-piece-square" data-reveal="card">
               <div className="rv2-piece-image">
                 <img
                   src="/ravera/instagram/porta-joias-joias.png"
@@ -467,7 +558,7 @@ function DirectionTwo() {
               </div>
               <div className="rv2-piece-meta"><h3>Porta-joias</h3><span>Detalhe pessoal</span></div>
             </article>
-            <article className="rv2-piece rv2-piece-wide">
+            <article className="rv2-piece rv2-piece-wide" data-reveal="card">
               <div className="rv2-piece-image">
                 <img
                   src="/ravera/instagram/relogio-preto.png"
@@ -480,7 +571,7 @@ function DirectionTwo() {
               </div>
               <div className="rv2-piece-meta"><h3>Relógios</h3><span>Forma no espaço</span></div>
             </article>
-            <article className="rv2-piece rv2-piece-detail">
+            <article className="rv2-piece rv2-piece-detail" data-reveal="card">
               <div className="rv2-piece-image">
                 <img
                   src="/ravera/instagram/marcador-vinho.jpeg"
@@ -494,17 +585,20 @@ function DirectionTwo() {
               <div className="rv2-piece-meta"><h3>Marcadores</h3><span>Flores preservadas</span></div>
             </article>
           </div>
+          <div className="rv2-pieces-catalog" data-reveal="content">
+            <a className="rv2-pill-link" href={catalogHref}>Ver catálogo completo <span aria-hidden="true">↗</span></a>
+          </div>
         </section>
 
         <section id="eternizacao" className="rv2-eternization" aria-labelledby="rv2-eternizacao-title">
           <div className="rv2-eternization-inner rv-container">
-            <div className="rv2-eternization-copy">
+            <div className="rv2-eternization-copy" data-reveal="content">
               <p className="rv-kicker">Eternização</p>
               <h2 id="rv2-eternizacao-title">O que é precioso encontra um novo lugar.</h2>
               <p>Flores e pequenas lembranças podem atravessar o tempo como parte de um objeto criado para permanecer por perto.</p>
               <InstagramLink className="rv2-pill-link">Conte sua história</InstagramLink>
             </div>
-            <div className="rv2-eternization-gallery">
+            <div className="rv2-eternization-gallery" data-reveal="image">
               <figure className="rv2-memory-main">
                 <img
                   src="/ravera/instagram/lembranca-celebracao.png"
@@ -531,7 +625,7 @@ function DirectionTwo() {
         </section>
 
         <section id="materia" className="rv2-material rv-container" aria-labelledby="rv2-material-title">
-          <div className="rv2-material-visual">
+          <div className="rv2-material-visual" data-reveal="image">
             <img
               src="/ravera/instagram/porta-taca-detalhe.jpeg"
               width="1200"
@@ -541,7 +635,7 @@ function DirectionTwo() {
               decoding="async"
             />
           </div>
-          <div className="rv2-material-copy">
+          <div className="rv2-material-copy" data-reveal="content">
             <p className="rv-kicker">Matéria e detalhe</p>
             <h2 id="rv2-material-title">A luz revela cada camada.</h2>
             <p>A transparência, as variações de cor, o desenho das bordas e os elementos preservados dão ritmo e singularidade a cada composição.</p>
@@ -555,7 +649,7 @@ function DirectionTwo() {
 
         <section id="criacao" className="rv2-process" aria-labelledby="rv2-process-title">
           <div className="rv-container">
-            <div className="rv2-process-heading">
+            <div className="rv2-process-heading" data-reveal="content">
               <div>
                 <p className="rv-kicker">Filosofia de criação</p>
                 <h2 id="rv2-process-title">Da intenção à forma.</h2>
@@ -563,17 +657,17 @@ function DirectionTwo() {
               <p>Um percurso sensível que começa no significado e termina em um objeto feito para conviver com a sua história.</p>
             </div>
             <div className="rv2-process-grid">
-              <div>
+              <div data-reveal="card">
                 <span>01</span>
                 <h3>História</h3>
                 <p>O ponto de partida é aquilo que importa para você.</p>
               </div>
-              <div>
+              <div data-reveal="card">
                 <span>02</span>
                 <h3>Criação</h3>
                 <p>Um olhar autoral conduz a expressão da ideia.</p>
               </div>
-              <div>
+              <div data-reveal="card">
                 <span>03</span>
                 <h3>Peça</h3>
                 <p>Forma e significado se encontram.</p>
@@ -584,42 +678,25 @@ function DirectionTwo() {
 
         <section id="catalogos" className="rv2-catalogs" aria-labelledby="rv2-catalogs-title">
           <div className="rv2-catalogs-inner rv-container">
-            <div className="rv2-catalogs-heading">
-              <p className="rv-kicker">Catálogos</p>
+            <div className="rv2-catalogs-heading" data-reveal="content">
+              <p className="rv-kicker">Catálogo RAVERA</p>
               <h2 id="rv2-catalogs-title">Um acervo para percorrer com tempo.</h2>
-              <p>Quando arquivos oficiais estiverem disponíveis, este espaço oferece visualização e download dos documentos originais.</p>
+              <p>Peças autorais para comprar, presentear e guardar, reunidas no mesmo catálogo apresentado pela RAVERA.</p>
             </div>
-            {landingTwoCatalogs.length > 0 ? (
-              <div className="rv2-catalog-grid">
-                {landingTwoCatalogs.map((catalog) => (
-                  <article className="rv2-catalog-card" key={catalog.file}>
-                    <div className="rv2-catalog-cover">
-                      {catalog.cover ? <img src={catalog.cover} alt={`Capa de ${catalog.title}`} loading="lazy" /> : <BrandMark tone="wine" />}
-                    </div>
-                    <h3>{catalog.title}</h3>
-                    <div className="rv2-catalog-actions">
-                      <a className="rv2-pill-link" href={catalog.file} target="_blank" rel="noopener noreferrer">Visualizar catálogo</a>
-                      <a className="rv2-quiet-link" href={catalog.file} download>Baixar PDF</a>
-                    </div>
-                  </article>
-                ))}
+            <a className="rv2-catalog-link" href={catalogHref} data-reveal="card">
+              <BrandMark tone="wine" />
+              <div>
+                <span>Catálogo RAVERA</span>
+                <h3>Peças autorais para comprar, presentear e guardar.</h3>
+                <p>Conheça a seleção completa de peças, materiais e objetos criados para permanecer no cotidiano.</p>
+                <span className="rv2-catalog-cta">Abrir catálogo <span aria-hidden="true">↗</span></span>
               </div>
-            ) : (
-              <div className="rv2-catalog-empty">
-                <BrandMark tone="wine" />
-                <div>
-                  <span>Acervo sob consulta</span>
-                  <h3>Conheça as peças em conversa com a RAVERA.</h3>
-                  <p>Não há um catálogo oficial disponível neste projeto. Explore as criações e consulte as peças diretamente com a marca.</p>
-                  <InstagramLink className="rv2-quiet-link">Conheça as criações</InstagramLink>
-                </div>
-              </div>
-            )}
+            </a>
           </div>
         </section>
 
         <section id="contato" className="rv2-contact">
-          <div className="rv-container">
+          <div className="rv-container" data-reveal="content">
             <p className="rv-kicker">Contato</p>
             <h2>Qual história você gostaria de contar?</h2>
             <p>Peças autorais, criações personalizadas e memórias que pedem uma forma só sua.</p>
@@ -627,9 +704,30 @@ function DirectionTwo() {
           </div>
         </section>
       </main>
-      <footer className="rv2-footer rv-container">
-        <span>RAVERA — Peças Autorais de Design</span>
-        <a href="#topo">Voltar ao início ↑</a>
+      <footer className="rv2-footer">
+        <div className="rv2-footer-inner rv-container">
+          <div className="rv2-footer-brand">
+            <a href="#topo" aria-label="RAVERA, voltar ao início">
+              <BrandMark tone="wine" decorative={false} eager={false} />
+            </a>
+          </div>
+          <nav className="rv2-footer-group" aria-label="Navegação do rodapé">
+            <p>Navegação</p>
+            <a href="#pecas">Peças</a>
+            <a href="#eternizacao">Eternização</a>
+            <a href="#historia">Sobre</a>
+          </nav>
+          <nav className="rv2-footer-group" aria-label="Catálogo e contato">
+            <p>Descobrir</p>
+            <a href={catalogHref}>Catálogo</a>
+            <a href="#contato">Contato</a>
+            <a href={instagram} target="_blank" rel="noopener noreferrer">Instagram <span aria-hidden="true">↗</span></a>
+          </nav>
+        </div>
+        <div className="rv2-footer-bottom rv-container">
+          <span>RAVERA — Peças Autorais de Design</span>
+          <a href="#topo">Voltar ao início <span aria-hidden="true">↑</span></a>
+        </div>
       </footer>
     </div>
   )

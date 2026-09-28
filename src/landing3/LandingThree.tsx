@@ -20,7 +20,7 @@ const navLinks = [
 
 // Também está no landing3/index.html (carrega mais cedo no build). No dev o
 // Vite serve o index.html da raiz para /landing3, então o componente garante.
-const FONTS_URL = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap'
+export const RAVERA_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap'
 
 const marqueeWords = ['Buquês de noiva', 'Lembranças de bebê', 'Relógios', 'Mesas', 'Bandejas', 'Xadrez', 'Dominó', 'Tábuas', 'Personalização']
 
@@ -103,7 +103,7 @@ function Dial() {
   )
 }
 
-function Logo({ stacked = false }: { stacked?: boolean }) {
+export function RaveraLogo({ stacked = false }: { stacked?: boolean }) {
   return (
     <span className={`ts-logo${stacked ? ' ts-logo--stacked' : ''}`}>
       <span className="ts-logo-mark">R</span>
@@ -141,7 +141,7 @@ function Header() {
     <header className={`ts-header${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' is-open' : ''}`}>
       <div className="ts-container ts-header-inner">
         <a href="#topo" className="ts-header-brand" aria-label="RAVERA — Peças autorais de design, início" onClick={() => setMenuOpen(false)}>
-          <Logo />
+          <RaveraLogo />
         </a>
         <nav className="ts-nav" aria-label="Navegação principal">
           {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
@@ -299,7 +299,7 @@ export default function LandingThree() {
     if (!document.querySelector('link[data-ts-fonts]')) {
       const fonts = document.createElement('link')
       fonts.rel = 'stylesheet'
-      fonts.href = FONTS_URL
+      fonts.href = RAVERA_FONTS_URL
       fonts.dataset.tsFonts = ''
       document.head.append(fonts)
     }
@@ -491,7 +491,7 @@ export default function LandingThree() {
 
       <footer className="ts-footer ts-dark">
         <div className="ts-container ts-footer-inner">
-          <a href="#topo" className="ts-footer-brand" aria-label="RAVERA — voltar ao início"><Logo stacked /></a>
+          <a href="#topo" className="ts-footer-brand" aria-label="RAVERA — voltar ao início"><RaveraLogo stacked /></a>
           <nav className="ts-footer-nav" aria-label="Rodapé">
             {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
             <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram ↗</a>
