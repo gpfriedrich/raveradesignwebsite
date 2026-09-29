@@ -6,12 +6,12 @@ type Direction = 1 | 2 | 3
 type LandingOneView = 'home' | 'catalog' | 'product'
 
 const logo = {
-  pearl: '/ravera/WhatsApp%20Image%202026-09-21%20at%2022.05.59.jpeg',
-  wine: '/ravera/WhatsApp%20Image%202026-09-21%20at%2022.05.591.jpeg',
-  taupe: '/ravera/WhatsApp%20Image%202026-09-21%20at%2022.05.592.jpeg',
+  pearl: '/ravera/Logomarca-Ravera-Design-sem-fundo-bege.png',
+  wine: '/ravera/Logomarca-Ravera-Design-sem-fundo-bege.png',
+  taupe: '/ravera/Logomarca-Ravera-Design-sem-fundo-roxa.png',
   transparentWine: '/ravera/ravera-logo-wine-transparent.png',
 }
-const logoSize = { pearl: [1237, 740], wine: [1396, 731], taupe: [1188, 722], transparentWine: [1188, 722] }
+const logoSize = { pearl: [1188, 722], wine: [1188, 722], taupe: [1188, 722], transparentWine: [1188, 722] }
 
 const products = [
   {
