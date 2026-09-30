@@ -12,6 +12,7 @@ export default defineConfig({
         landing1: fileURLToPath(new URL('./landing1/index.html', import.meta.url)),
         landing2: fileURLToPath(new URL('./landing2/index.html', import.meta.url)),
         landing3: fileURLToPath(new URL('./landing3/index.html', import.meta.url)),
+        catalogo: fileURLToPath(new URL('./catalogo/index.html', import.meta.url)),
       },
     },
   },
