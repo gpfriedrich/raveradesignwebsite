@@ -5,6 +5,8 @@ export const INSTAGRAM_HANDLE = 'ravera.designn'
 export const INSTAGRAM_URL = `https://www.instagram.com/${INSTAGRAM_HANDLE}/`
 // ig.me abre direto a conversa (DM) com o perfil.
 export const INSTAGRAM_DM_URL = `https://ig.me/m/${INSTAGRAM_HANDLE}`
+// Catálogo compartilhado entre as landings (rota criada no PR #3).
+export const CATALOG_URL = '/catalogo'
 // Preencher só com dígitos (ex.: 5544999999999) quando a cliente passar o número.
 // Enquanto estiver vazio, o formulário de encomenda usa o Instagram.
 export const WHATSAPP_NUMBER = ''

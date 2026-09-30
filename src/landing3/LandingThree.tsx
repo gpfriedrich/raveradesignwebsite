@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
 import {
+  CATALOG_URL,
   INSTAGRAM_DM_URL,
   INSTAGRAM_HANDLE,
   INSTAGRAM_URL,
@@ -13,7 +14,7 @@ import './landing3.css'
 
 const navLinks = [
   { href: '#eternizacao', label: 'Eternização' },
-  { href: '#colecao', label: 'Coleção' },
+  { href: CATALOG_URL, label: 'Catálogo' },
   { href: '#pecas', label: 'Peças' },
   { href: '#encomenda', label: 'Encomendas' },
 ]
@@ -341,7 +342,7 @@ export default function LandingThree() {
               </p>
               <div className="ts-hero-actions">
                 <a className="ts-button ts-button--gold" href="#encomenda">Eternizar uma memória</a>
-                <a className="ts-link" href="#colecao">Ver a coleção <span aria-hidden="true">↓</span></a>
+                <a className="ts-link" href={CATALOG_URL}>Ver o catálogo <span aria-hidden="true">→</span></a>
               </div>
             </div>
 
@@ -446,7 +447,10 @@ export default function LandingThree() {
                 <p className="ts-kicker">Peças recentes</p>
                 <h2 id="ts-pieces-title">Direto do ateliê.</h2>
               </div>
-              <a className="ts-link" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Ver mais no Instagram <span aria-hidden="true">↗</span></a>
+              <div className="ts-section-head-links">
+                <a className="ts-link" href={CATALOG_URL}>Ver catálogo completo <span aria-hidden="true">→</span></a>
+                <a className="ts-link" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Ver mais no Instagram <span aria-hidden="true">↗</span></a>
+              </div>
             </div>
             <ul className="ts-pieces-grid">
               {pieces.map((piece) => (

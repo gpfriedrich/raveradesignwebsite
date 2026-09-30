@@ -262,6 +262,12 @@ body:has(> #root > .ts) {
   color: var(--dourado-escuro);
 }
 
+.ts-section-head-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 32px;
+}
+
 /* ---------- Logo tipográfica ----------
    Recriada em texto (Cormorant + Jost) a partir da versão de impressão.
    Quando existir o SVG oficial, basta trocar este componente. */
