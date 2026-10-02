@@ -1,6 +1,6 @@
-/* Landing 3 — "Tempo Suspenso"
+﻿/* Landing 3 — "Tempo Suspenso"
    Tudo aqui fica sob o prefixo .ts / .ts-* para não colidir com o CSS
-   compartilhado das outras landings (RaveraLandings.css, index.css). */
+   das versões alternativas. */
 
 html:has(.ts) {
   font-size: 16px;
@@ -266,7 +266,7 @@ body:has(> #root > .ts) {
    Recriada em texto (Cormorant + Jost) a partir da versão de impressão.
    Quando existir o SVG oficial, basta trocar este componente. */
 
-.ts-logo {
+.ts .ts-logo {
   display: inline-flex;
   align-items: center;
   gap: 14px;
@@ -275,7 +275,7 @@ body:has(> #root > .ts) {
   color: var(--perola);
 }
 
-.ts-logo-mark {
+.ts .ts-logo-mark {
   padding-right: 14px;
   border-right: 1px solid rgba(201, 176, 132, .55);
   font-size: 2.1rem;
@@ -283,32 +283,32 @@ body:has(> #root > .ts) {
   color: var(--dourado);
 }
 
-.ts-logo-word {
+.ts .ts-logo-word {
   margin-right: -.42em;
   font-size: 1.1rem;
   font-weight: 500;
   letter-spacing: .42em;
 }
 
-.ts-logo--stacked {
+.ts .ts-logo--stacked {
   flex-direction: column;
   gap: 12px;
   color: var(--dourado);
 }
 
-.ts-logo--stacked .ts-logo-mark {
+.ts .ts-logo--stacked .ts-logo-mark {
   padding: 0;
   border: 0;
   font-size: 4.6rem;
 }
 
-.ts-logo--stacked .ts-logo-word {
+.ts .ts-logo--stacked .ts-logo-word {
   font-size: 1.9rem;
   letter-spacing: .5em;
   margin-right: -.5em;
 }
 
-.ts-logo-tag {
+.ts .ts-logo-tag {
   margin-top: 4px;
   margin-right: -.34em;
   font-family: var(--sans);
@@ -1476,11 +1476,11 @@ body:has(> #root > .ts) {
     display: none;
   }
 
-  .ts-logo-mark {
+  .ts .ts-logo-mark {
     font-size: 1.8rem;
   }
 
-  .ts-logo-word {
+  .ts .ts-logo-word {
     font-size: 1rem;
   }
 
@@ -1546,11 +1546,11 @@ body:has(> #root > .ts) {
     padding: 32px 24px;
   }
 
-  .ts-logo--stacked .ts-logo-mark {
+  .ts .ts-logo--stacked .ts-logo-mark {
     font-size: 3.8rem;
   }
 
-  .ts-logo--stacked .ts-logo-word {
+  .ts .ts-logo--stacked .ts-logo-word {
     font-size: 1.5rem;
   }
 }
@@ -1567,3 +1567,6 @@ body:has(> #root > .ts) {
     transition: none !important;
   }
 }
+
+
+

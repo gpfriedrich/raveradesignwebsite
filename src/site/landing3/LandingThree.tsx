@@ -18,10 +18,6 @@ const navLinks = [
   { href: '#encomenda', label: 'Encomendas' },
 ]
 
-// Também está no landing3/index.html (carrega mais cedo no build). No dev o
-// Vite serve o index.html da raiz para /landing3, então o componente garante.
-export const RAVERA_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap'
-
 const marqueeWords = ['Buquês de noiva', 'Lembranças de bebê', 'Relógios', 'Mesas', 'Bandejas', 'Xadrez', 'Dominó', 'Tábuas', 'Personalização']
 
 // Contorno irregular inspirado na borda das peças dela (porta-joias e bandejas
@@ -103,7 +99,7 @@ function Dial() {
   )
 }
 
-export function RaveraLogo({ stacked = false }: { stacked?: boolean }) {
+function RaveraLogo({ stacked = false }: { stacked?: boolean }) {
   return (
     <span className={`ts-logo${stacked ? ' ts-logo--stacked' : ''}`}>
       <span className="ts-logo-mark">R</span>
@@ -287,23 +283,6 @@ function OrderForm() {
 
 export default function LandingThree() {
   const rootRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    document.title = 'RAVERA — Peças Autorais de Design | Tempo Suspenso'
-    document.documentElement.lang = 'pt-BR'
-    const favicon = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
-    if (favicon) {
-      favicon.href = '/ravera/favicon.png'
-      favicon.type = 'image/png'
-    }
-    if (!document.querySelector('link[data-ts-fonts]')) {
-      const fonts = document.createElement('link')
-      fonts.rel = 'stylesheet'
-      fonts.href = RAVERA_FONTS_URL
-      fonts.dataset.tsFonts = ''
-      document.head.append(fonts)
-    }
-  }, [])
 
   // Revela as seções ao entrar na tela. Sem IntersectionObserver ou com
   // "reduzir movimento" ligado, a classe ts--motion nunca entra e tudo já

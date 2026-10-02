@@ -1,30 +1,32 @@
-# RAVERA — estudos de landing page
+﻿# RAVERA — site oficial
 
-Três direções visuais independentes no aplicativo React/Vite:
+A landing3 escolhida pela cliente é a página inicial em `/`. A antiga rota `/landing3/` continua como alias. O projeto usa React, TypeScript e Vite.
 
-- `/landing1` — editorial minimalista
-- `/landing2` — narrativa orgânica
-- `/landing3` — tempo suspenso (código isolado em `src/landing3/`)
-
-A rota `/` continua com a página inicial que já existia no projeto.
-O build gera arquivos HTML próprios em `dist/landing1/`, `dist/landing2/` e `dist/landing3/` para acesso direto em hospedagem estática.
-
-## Executar
+## Executar e verificar
 
 ```bash
 npm install
 npm run dev
-```
-
-```bash
 npm run build
 npm run lint
 ```
 
-## Materiais e conteúdo
+Não há script de testes automatizados no `package.json`.
 
-As três versões usam os arquivos oficiais de logotipo copiados para `public/ravera/`. Os arquivos originais continuam em `Ravera-Designn-materiais/`; as páginas não dependem dessa pasta em tempo de execução.
+## Estrutura
 
-Os PDFs de identidade fornecem a paleta e os nomes dos universos Decoração, Madeira Rústica, Eternização e Xadrez Joia. Não há fotografias de peças nos materiais locais. Por isso, as composições atuais usam apenas os logotipos e evitam identificar peças ou características que não estejam documentadas.
+- `src/site/landing3/`: componente, conteúdo e estilos exclusivos do site oficial.
+- `src/alternatives/landing1/`: versão editorial, incluindo catálogo e páginas de produto.
+- `src/alternatives/landing2/`: versão narrativa e seus estilos.
+- `src/App.tsx`: seleção das rotas; os protótipos são carregados sob demanda.
+- `vite.config.ts` e `prototipos/`: entradas HTML para hospedagem estática.
+- `public/ravera/`: arquivos de marca e imagens usados pelas páginas. As fotos próprias da landing3 ficam em `public/ravera/landing3/`; as imagens das versões anteriores estão em `instagram/` e `portfolio/`.
+- `archive/landing1-landing2/`: cópia integral do código anterior à separação para consulta histórica.
 
-Os convites de contato levam ao [perfil oficial da RAVERA no Instagram](https://www.instagram.com/ravera.designn/), informado para este projeto.
+## Consultar versões anteriores
+
+- `/prototipos/landing1/` — landing1.
+- `/prototipos/landing2/` — landing2.
+- `/prototipos/catalogo/` — catálogo da landing1, com cinco páginas de produto em `/prototipos/catalogo/<slug>/`.
+
+Essas rotas fazem parte do build para consulta direta, mas não aparecem nos menus ou no rodapé do site oficial. Para reativar uma versão como página inicial, ajuste a seleção de rota em `src/App.tsx` e o conteúdo de `index.html` conforme necessário. Os arquivos originais permanecem em `archive/landing1-landing2/`.
