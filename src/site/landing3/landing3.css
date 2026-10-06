@@ -198,7 +198,7 @@ body:has(> #root > .ts) {
   transform: translateY(-2px);
 }
 
-.ts-button--gold {
+.ts .ts-button--gold {
   background: var(--dourado);
   color: var(--vinho-profundo);
   box-shadow: inset 0 0 0 4px var(--dourado), inset 0 0 0 5px rgba(36, 19, 29, .35);
@@ -209,7 +209,7 @@ body:has(> #root > .ts) {
   box-shadow: inset 0 0 0 4px var(--dourado-claro), inset 0 0 0 5px rgba(36, 19, 29, .35), 0 14px 30px -14px rgba(201, 176, 132, .7);
 }
 
-.ts-button--wine {
+.ts .ts-button--wine {
   background: var(--vinho);
   color: var(--perola);
   box-shadow: inset 0 0 0 4px var(--vinho), inset 0 0 0 5px rgba(201, 176, 132, .55);
@@ -599,8 +599,7 @@ body:has(> #root > .ts) {
 
 /* Brilho de superfície: a luz batendo na resina curada. */
 .ts-geode-clip::after,
-.ts-piece-image::after,
-.ts-eternal-photo::after {
+.ts-piece-image::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -777,91 +776,6 @@ body:has(> #root > .ts) {
   color: var(--grafite);
 }
 
-/* ---------- Eternização ---------- */
-
-.ts-eternal {
-  padding-block: clamp(96px, 12vw, 168px);
-}
-
-.ts-eternal-grid {
-  display: grid;
-  grid-template-columns: minmax(0, .8fr) minmax(0, 1.2fr);
-  align-items: center;
-  gap: clamp(48px, 8vw, 128px);
-}
-
-.ts-eternal-photo {
-  position: relative;
-  justify-self: center;
-  width: min(100%, 420px);
-}
-
-.ts-eternal-photo img {
-  width: 100%;
-  aspect-ratio: 407 / 562;
-  object-fit: cover;
-}
-
-/* Moldura dourada deslocada, como passe-partout de galeria. */
-.ts-eternal-photo::before {
-  content: '';
-  position: absolute;
-  inset: -16px 16px 16px -16px;
-  z-index: -1;
-  border: 1px solid rgba(201, 176, 132, .6);
-}
-
-.ts-eternal-copy h2 {
-  margin: 20px 0 24px;
-  font-size: clamp(2.5rem, 4.8vw, 4.4rem);
-}
-
-.ts-eternal-copy h2 em {
-  display: block;
-  font-weight: 400;
-  color: var(--dourado);
-}
-
-.ts-eternal-copy > p {
-  max-width: 34rem;
-  font-size: 1.08rem;
-  font-weight: 300;
-  line-height: 1.75;
-  color: rgba(244, 241, 235, .82);
-}
-
-.ts-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin: 32px 0 40px;
-  padding: 0;
-  list-style: none;
-}
-
-.ts-chips li {
-  padding: 9px 16px;
-  border: 1px solid rgba(201, 176, 132, .42);
-  font-size: .74rem;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--dourado-claro);
-}
-
-.ts-eternal-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 18px 28px;
-}
-
-.ts-eternal-note {
-  font-size: .74rem;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-  color: rgba(244, 241, 235, .64);
-}
-
 /* ---------- Coleção (índice de categorias) ---------- */
 
 .ts-collection {
@@ -1025,7 +939,7 @@ body:has(> #root > .ts) {
 /* ---------- Peças recentes ---------- */
 
 .ts-pieces {
-  padding-block: clamp(96px, 12vw, 160px) clamp(120px, 14vw, 200px);
+  padding-block: clamp(96px, 12vw, 160px) clamp(72px, 8vw, 112px);
   background: var(--papel);
 }
 
@@ -1082,198 +996,6 @@ body:has(> #root > .ts) {
 .ts-piece-description {
   margin-top: 6px;
   font-size: .93rem;
-  color: var(--grafite);
-}
-
-.ts-piece-price {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--linha);
-  font-size: .74rem;
-  letter-spacing: .16em;
-  text-transform: uppercase;
-}
-
-/* ---------- Encomendas ---------- */
-
-.ts-order {
-  position: relative;
-  isolation: isolate;
-  padding-block: clamp(96px, 12vw, 160px);
-  background:
-    radial-gradient(60% 60% at 0% 0%, rgba(244, 241, 235, .28), transparent 70%),
-    var(--taupe);
-}
-
-/* Pó dourado sobre o taupe, como na versão de impressão da logo. */
-.ts-order::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: var(--speckle);
-  opacity: .55;
-  pointer-events: none;
-}
-
-.ts-order .ts-kicker {
-  color: var(--vinho);
-}
-
-.ts-order-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(48px, 7vw, 112px);
-}
-
-.ts-order-copy h2 {
-  margin: 18px 0 40px;
-  font-size: clamp(2.5rem, 4.4vw, 4rem);
-}
-
-.ts-steps {
-  display: grid;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.ts-steps li {
-  display: grid;
-  grid-template-columns: 3.4rem minmax(0, 1fr);
-  gap: 16px;
-  padding: 18px 0;
-  border-top: 1px solid rgba(56, 31, 46, .24);
-}
-
-.ts-steps-numeral {
-  font-family: var(--serif);
-  font-size: 1.6rem;
-  font-style: italic;
-  line-height: 1.1;
-}
-
-.ts-steps h3 {
-  font-size: 1.5rem;
-}
-
-.ts-steps p {
-  margin-top: 4px;
-  font-size: .96rem;
-}
-
-.ts-order-note {
-  margin-top: 28px;
-  padding-left: 16px;
-  border-left: 2px solid var(--vinho);
-  font-size: .92rem;
-}
-
-.ts-form {
-  position: relative;
-  display: grid;
-  gap: 24px;
-  padding: clamp(32px, 4vw, 52px);
-  background: var(--perola);
-  box-shadow: 0 50px 90px -50px rgba(36, 19, 29, .7);
-}
-
-.ts-form::before {
-  content: '';
-  position: absolute;
-  inset: 10px;
-  border: 1px solid rgba(139, 109, 66, .35);
-  pointer-events: none;
-}
-
-.ts-form-title {
-  font-family: var(--serif);
-  font-size: 2rem;
-  font-weight: 500;
-  line-height: 1.1;
-}
-
-.ts-form label {
-  display: grid;
-  gap: 6px;
-}
-
-.ts-form label > span {
-  font-size: .72rem;
-  font-weight: 500;
-  letter-spacing: .2em;
-  text-transform: uppercase;
-  color: var(--grafite);
-}
-
-.ts-form small {
-  font-size: .72rem;
-  letter-spacing: .04em;
-  text-transform: none;
-}
-
-.ts-form input,
-.ts-form select,
-.ts-form textarea {
-  width: 100%;
-  padding: 10px 0;
-  border: 0;
-  border-bottom: 1px solid rgba(56, 31, 46, .35);
-  border-radius: 0;
-  background: transparent;
-  color: var(--vinho);
-  font: inherit;
-  font-size: 1.02rem;
-  transition: border-color .3s, box-shadow .3s;
-}
-
-.ts-form input:focus,
-.ts-form select:focus,
-.ts-form textarea:focus {
-  outline: none;
-  border-color: var(--vinho);
-  box-shadow: 0 1px 0 var(--vinho);
-}
-
-.ts-form select {
-  appearance: none;
-  padding-right: 28px;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23381F2E' stroke-width='1.2'/%3E%3C/svg%3E") no-repeat right 4px center;
-  cursor: pointer;
-}
-
-.ts-form textarea {
-  min-height: 104px;
-  resize: vertical;
-}
-
-.ts-form ::placeholder {
-  color: rgba(104, 97, 90, .8);
-}
-
-.ts-form .ts-button {
-  width: 100%;
-  margin-top: 4px;
-}
-
-.ts-form-note {
-  font-size: .84rem;
-  color: var(--grafite);
-}
-
-.ts-form-status {
-  padding: 16px 18px;
-  border: 1px solid rgba(139, 109, 66, .4);
-  background: rgba(201, 176, 132, .16);
-  font-size: .92rem;
-}
-
-.ts-form-status pre {
-  margin: 10px 0 0;
-  font-family: var(--sans);
-  font-size: .9rem;
-  white-space: pre-wrap;
   color: var(--grafite);
 }
 
@@ -1405,14 +1127,8 @@ body:has(> #root > .ts) {
     width: min(100%, 460px);
   }
 
-  .ts-origin-grid,
-  .ts-eternal-grid,
-  .ts-order-grid {
+  .ts-origin-grid {
     grid-template-columns: 1fr;
-  }
-
-  .ts-eternal-photo {
-    width: min(100% - 16px, 360px);
   }
 
   .ts-index {
@@ -1536,14 +1252,6 @@ body:has(> #root > .ts) {
 
   .ts-piece:nth-child(even) {
     margin-top: 0;
-  }
-
-  .ts-steps li {
-    grid-template-columns: 2.6rem minmax(0, 1fr);
-  }
-
-  .ts-form {
-    padding: 32px 24px;
   }
 
   .ts .ts-logo--stacked .ts-logo-mark {

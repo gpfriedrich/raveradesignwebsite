@@ -1,22 +1,12 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from 'react'
-import {
-  INSTAGRAM_DM_URL,
-  INSTAGRAM_HANDLE,
-  INSTAGRAM_URL,
-  LEAD_TIME,
-  WHATSAPP_NUMBER,
-  categories,
-  pieces,
-  steps,
-} from './content'
+import { useMemo, useRef, useState, type CSSProperties } from 'react'
+import { categories, pieces } from './content'
+import { INSTAGRAM_URL } from '../shared/contact'
+import { CATALOG_PATH } from '../catalog/catalogRoutes'
+import SiteHeader from '../shared/SiteHeader'
+import SiteFooter from '../shared/SiteFooter'
+import useSectionReveal from '../shared/useSectionReveal'
+import CatalogSection from '../catalog/CatalogSection'
 import './landing3.css'
-
-const navLinks = [
-  { href: '#eternizacao', label: 'Eternização' },
-  { href: '#colecao', label: 'Coleção' },
-  { href: '#pecas', label: 'Peças' },
-  { href: '#encomenda', label: 'Encomendas' },
-]
 
 const marqueeWords = ['Buquês de noiva', 'Lembranças de bebê', 'Relógios', 'Mesas', 'Bandejas', 'Xadrez', 'Dominó', 'Tábuas', 'Personalização']
 
@@ -99,73 +89,6 @@ function Dial() {
   )
 }
 
-function RaveraLogo({ stacked = false }: { stacked?: boolean }) {
-  return (
-    <span className={`ts-logo${stacked ? ' ts-logo--stacked' : ''}`}>
-      <span className="ts-logo-mark">R</span>
-      <span className="ts-logo-word">RAVERA</span>
-      {stacked && <span className="ts-logo-tag">Peças autorais de design</span>}
-    </span>
-  )
-}
-
-function Header() {
-  const [scrolled, setScrolled] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
-
-  useEffect(() => {
-    if (!menuOpen) return
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setMenuOpen(false)
-    }
-    document.documentElement.style.overflow = 'hidden'
-    window.addEventListener('keydown', onKey)
-    return () => {
-      document.documentElement.style.overflow = ''
-      window.removeEventListener('keydown', onKey)
-    }
-  }, [menuOpen])
-
-  return (
-    <header className={`ts-header${scrolled ? ' is-scrolled' : ''}${menuOpen ? ' is-open' : ''}`}>
-      <div className="ts-container ts-header-inner">
-        <a href="#topo" className="ts-header-brand" aria-label="RAVERA — Peças autorais de design, início" onClick={() => setMenuOpen(false)}>
-          <RaveraLogo />
-        </a>
-        <nav className="ts-nav" aria-label="Navegação principal">
-          {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
-        </nav>
-        <a className="ts-button ts-button--gold ts-header-cta" href="#encomenda">Encomendar</a>
-        <button
-          type="button"
-          className="ts-menu-toggle"
-          aria-expanded={menuOpen}
-          aria-controls="ts-mobile-menu"
-          onClick={() => setMenuOpen((open) => !open)}
-        >
-          <span className="ts-menu-icon" aria-hidden="true" />
-          <span className="ts-sr-only">{menuOpen ? 'Fechar menu' : 'Abrir menu'}</span>
-        </button>
-      </div>
-      <nav id="ts-mobile-menu" className="ts-mobile-menu" aria-label="Menu" hidden={!menuOpen}>
-        {navLinks.map((link, index) => (
-          <a key={link.href} href={link.href} onClick={() => setMenuOpen(false)} style={{ '--item': index } as CSSProperties}>
-            {link.label}
-          </a>
-        ))}
-        <a className="ts-mobile-menu-ig" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">@{INSTAGRAM_HANDLE} ↗</a>
-      </nav>
-    </header>
-  )
-}
-
 function CategoryIndex() {
   const [activeId, setActiveId] = useState(categories[0].id)
   const active = categories.find((category) => category.id === activeId) ?? categories[0]
@@ -219,95 +142,15 @@ function CategoryIndex() {
   )
 }
 
-function OrderForm() {
-  const [sentMessage, setSentMessage] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
-  const channel = WHATSAPP_NUMBER ? 'WhatsApp' : 'Instagram'
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    const data = new FormData(event.currentTarget)
-    const name = String(data.get('nome') ?? '').trim()
-    const kind = String(data.get('peca') ?? '')
-    const story = String(data.get('historia') ?? '').trim()
-    const message = [
-      `Olá, Ravera! Meu nome é ${name}.`,
-      `Tenho interesse em: ${kind}.`,
-      story && `Sobre a peça: ${story}`,
-    ].filter(Boolean).join('\n')
-
-    if (WHATSAPP_NUMBER) {
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank', 'noopener')
-      return
-    }
-
-    // O Instagram não aceita texto pré-preenchido na DM: copiamos a mensagem
-    // e abrimos a conversa. A cópia começa antes do window.open porque a
-    // Clipboard API exige que a aba ainda esteja em foco.
-    setCopied(false)
-    navigator.clipboard?.writeText(message).then(() => setCopied(true), () => setCopied(false))
-    setSentMessage(message)
-    window.open(INSTAGRAM_DM_URL, '_blank', 'noopener')
-  }
-
-  return (
-    <form className="ts-form" onSubmit={handleSubmit}>
-      <p className="ts-form-title">Monte seu pedido</p>
-      <label>
-        <span>Seu nome</span>
-        <input name="nome" type="text" autoComplete="given-name" required />
-      </label>
-      <label>
-        <span>Que tipo de peça?</span>
-        <select name="peca" required defaultValue="">
-          <option value="" disabled>Escolha uma opção</option>
-          {categories.map((category) => <option key={category.id} value={category.name}>{category.name}</option>)}
-          <option value="Ainda não sei">Ainda não sei</option>
-        </select>
-      </label>
-      <label>
-        <span>Conte a história <small>(opcional)</small></span>
-        <textarea name="historia" rows={4} placeholder="Ex.: quero eternizar o buquê do meu casamento, que foi em março…" />
-      </label>
-      <button type="submit" className="ts-button ts-button--wine">Continuar no {channel} <span aria-hidden="true">↗</span></button>
-      <p className="ts-form-note">Nada é enviado por este site: a mensagem é montada aqui e você decide se envia pelo {channel}.</p>
-      {sentMessage && (
-        <div className="ts-form-status" role="status">
-          <p>{copied ? `Mensagem copiada — é só colar na conversa com @${INSTAGRAM_HANDLE}.` : `Copie a mensagem abaixo e cole na conversa com @${INSTAGRAM_HANDLE}.`}</p>
-          <pre>{sentMessage}</pre>
-        </div>
-      )}
-    </form>
-  )
-}
-
 export default function LandingThree() {
   const rootRef = useRef<HTMLDivElement>(null)
 
-  // Revela as seções ao entrar na tela. Sem IntersectionObserver ou com
-  // "reduzir movimento" ligado, a classe ts--motion nunca entra e tudo já
-  // aparece visível pelo CSS.
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root || !('IntersectionObserver' in window)) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-
-    root.classList.add('ts--motion')
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (!entry.isIntersecting) continue
-        entry.target.classList.add('is-in')
-        observer.unobserve(entry.target)
-      }
-    }, { rootMargin: '0px 0px -12% 0px' })
-    root.querySelectorAll('[data-reveal]').forEach((element) => observer.observe(element))
-    return () => observer.disconnect()
-  }, [])
+  useSectionReveal(rootRef)
 
   return (
     <div className="ts" id="topo" ref={rootRef}>
       <a className="ts-skip" href="#conteudo">Pular para o conteúdo</a>
-      <Header />
+      <SiteHeader home />
 
       <main id="conteudo">
         <section className="ts-hero ts-dark" aria-labelledby="ts-hero-title">
@@ -319,7 +162,7 @@ export default function LandingThree() {
                 Peças únicas de decoração e a eternização de buquês de noiva, lembranças de bebê e tudo o que merece durar.
               </p>
               <div className="ts-hero-actions">
-                <a className="ts-button ts-button--gold" href="#encomenda">Eternizar uma memória</a>
+                <a className="ts-button ts-button--gold" href={`${CATALOG_PATH}/`}>Eternizar uma memória</a>
                 <a className="ts-link" href="#colecao">Ver a coleção <span aria-hidden="true">↓</span></a>
               </div>
             </div>
@@ -380,31 +223,7 @@ export default function LandingThree() {
           </div>
         </section>
 
-        <section id="eternizacao" className="ts-eternal ts-dark" aria-labelledby="ts-eternal-title">
-          <div className="ts-container ts-eternal-grid">
-            <div className="ts-eternal-photo" data-reveal>
-              <img src="/ravera/landing3/lembranca-noiva-barbara.webp" alt="Noiva de vestido branco segurando uma peça em resina com o nome Bárbara e borda dourada" loading="lazy" decoding="async" />
-            </div>
-            <div className="ts-eternal-copy" data-reveal>
-              <p className="ts-kicker">Eternização</p>
-              <h2 id="ts-eternal-title">O buquê murcha. <em>A lembrança, não.</em></h2>
-              <p>
-                Selamos em resina o que é passageiro — as flores do casamento, as lembranças do bebê, a flor de uma data especial —
-                e transformamos em peça: porta-joias, bandeja, quadro ou relógio, com nome, data e detalhes em dourado.
-              </p>
-              <ul className="ts-chips">
-                <li>Buquês de noiva</li>
-                <li>Lembranças de bebê</li>
-                <li>Flores de datas especiais</li>
-                <li>Nome e data em dourado</li>
-              </ul>
-              <div className="ts-eternal-actions">
-                <a className="ts-button ts-button--gold" href="#encomenda">Quero eternizar</a>
-                <span className="ts-eternal-note">Sob encomenda · prazo médio de {LEAD_TIME}</span>
-              </div>
-            </div>
-          </div>
-        </section>
+        <CatalogSection />
 
         <section id="colecao" className="ts-collection" aria-labelledby="ts-collection-title">
           <div className="ts-container">
@@ -436,48 +255,15 @@ export default function LandingThree() {
                   <p className="ts-piece-category">{piece.category}</p>
                   <h3>{piece.name}</h3>
                   <p className="ts-piece-description">{piece.description}</p>
-                  <p className="ts-piece-price">{piece.price ?? 'Valor sob consulta'}</p>
                 </li>
               ))}
             </ul>
           </div>
         </section>
 
-        <section id="encomenda" className="ts-order" aria-labelledby="ts-order-title">
-          <div className="ts-container ts-order-grid">
-            <div className="ts-order-copy" data-reveal>
-              <p className="ts-kicker">Encomendas</p>
-              <h2 id="ts-order-title">Qual história você quer guardar?</h2>
-              <ol className="ts-steps">
-                {steps.map((step) => (
-                  <li key={step.numeral}>
-                    <span className="ts-steps-numeral">{step.numeral}</span>
-                    <div>
-                      <h3>{step.title}</h3>
-                      <p>{step.text}</p>
-                    </div>
-                  </li>
-                ))}
-              </ol>
-              <p className="ts-order-note">Peças prontas têm valor na própria peça. Encomendas e eternizações são sob consulta, com prazo médio de {LEAD_TIME}.</p>
-            </div>
-            <div data-reveal>
-              <OrderForm />
-            </div>
-          </div>
-        </section>
       </main>
 
-      <footer className="ts-footer ts-dark">
-        <div className="ts-container ts-footer-inner">
-          <a href="#topo" className="ts-footer-brand" aria-label="RAVERA — voltar ao início"><RaveraLogo stacked /></a>
-          <nav className="ts-footer-nav" aria-label="Rodapé">
-            {navLinks.map((link) => <a key={link.href} href={link.href}>{link.label}</a>)}
-            <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Instagram ↗</a>
-          </nav>
-          <p className="ts-footer-legal">© {new Date().getFullYear()} Ravera — Peças autorais de design</p>
-        </div>
-      </footer>
+      <SiteFooter home />
     </div>
   )
 }
