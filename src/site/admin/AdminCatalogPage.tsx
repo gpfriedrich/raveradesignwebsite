@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import RaveraLogo from '../shared/RaveraLogo'
 import useAdminSmoothScroll from './useAdminSmoothScroll'
-import { fetchProducts, fetchAllProducts, upsertProduct, deleteProduct, type DbProduct } from '../catalog/catalogService'
+import { fetchAllProducts, upsertProduct, deleteProduct } from '../catalog/catalogService'
+import type { DbProduct } from '../catalog/catalogTypes'
 import '../landing3/landing3.css'
 import './adminCatalog.css'
 
@@ -31,7 +32,6 @@ export default function AdminCatalogPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
-  const [status, setStatus] = useState('')
   const [editor, setEditor] = useState<{ id?: string } | null>(null)
   const [draft, setDraft] = useState<Draft>(emptyDraft)
   const [errors, setErrors] = useState<Record<string, string>>({})
@@ -58,8 +58,7 @@ export default function AdminCatalogPage() {
 
   useEffect(() => { const title = document.title; document.title = 'Gerenciar catálogo — RAVERA'; return () => { document.title = title } }, [])
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
-  const filtered = products.filter(p => normalize(p.name).includes(normalize(search.trim())) && (!category || p.category === category) && (!status || p.active === (status === 'active')))
-  const activeCount = products.filter(p => p.active).length
+  const filtered = products.filter(p => normalize(p.name).includes(normalize(search.trim())) && (!category || p.category === category))
   function openEditor(product?: Product) {
     setDraft(product ? { ...product, images: [...product.images], price: product.price.toFixed(2).replace('.', ',') } : emptyDraft())
     setErrors({}); setImageError(''); setEditor(product ? { id: product.id } : {})
@@ -92,7 +91,6 @@ export default function AdminCatalogPage() {
         summary: draft.description.trim(),
         category: draft.category,
         price,
-        active: draft.active,
         image_src: imageSrc,
         image_alt: draft.name.trim(),
         image_width: 0,
@@ -112,7 +110,6 @@ export default function AdminCatalogPage() {
         description: p.summary || '',
         price: p.price,
         category: p.category || '',
-        active: p.active,
         images: [p.image.src],
       })))
     } catch (e) {
@@ -152,12 +149,12 @@ export default function AdminCatalogPage() {
       <div className="ac-stats"><div><span>Total de produtos</span><strong>{products.length.toString().padStart(2, '0')}</strong></div></div>
       {notice && <div className="ac-notice" role="status"><span>✓ {notice}</span><button className="ac-icon" aria-label="Dispensar mensagem" onClick={() => setNotice('')}>×</button></div>}
       <section className="ac-panel" aria-label="Produtos cadastrados">
-        <div className="ac-filters"><label>Buscar produto<input type="search" placeholder="Buscar pelo nome…" value={search} onChange={e => setSearch(e.target.value)} /></label><label>Categoria<select value={category} onChange={e => setCategory(e.target.value)}><option value="">Todas as categorias</option>{categories.map(c => <option key={c}>{c}</option>)}</select></label>{(search || category) && <button className="ac-text-button" onClick={() => { setSearch(''); setCategory(''); setStatus('') }}>Limpar filtros</button>}</div>
+        <div className="ac-filters"><label>Buscar produto<input type="search" placeholder="Buscar pelo nome…" value={search} onChange={e => setSearch(e.target.value)} /></label><label>Categoria<select value={category} onChange={e => setCategory(e.target.value)}><option value="">Todas as categorias</option>{categories.map(c => <option key={c}>{c}</option>)}</select></label>{(search || category) && <button className="ac-text-button" onClick={() => { setSearch(''); setCategory('') }}>Limpar filtros</button>}</div>
         <div className="ac-list-heading"><h2>Suas criações</h2><span aria-live="polite">{filtered.length} {filtered.length === 1 ? 'produto' : 'produtos'}</span></div>
         {filtered.length ? <div className="ac-products">{filtered.map(product => <article className="ac-product" key={product.id}>
           <img src={product.images[0]} alt={product.name} /><div className="ac-product-info"><span className="ac-category">{product.category}</span><h3>{product.name}</h3><span className="ac-price">{money(product.price)}</span></div>
           <div className="ac-actions"><button onClick={() => openEditor(product)} aria-label={`Editar ${product.name}`}>Editar</button><button className="ac-delete" aria-label={`Excluir ${product.name}`} onClick={() => setDeleting(product)}>Excluir</button></div>
-        </article>)}</div> : <div className="ac-empty"><span aria-hidden="true">◇</span><h3>{products.length ? 'Nenhum produto encontrado' : 'Sua primeira criação começa aqui'}</h3><p>{products.length ? 'Experimente outro nome ou ajuste os filtros para encontrar suas peças.' : 'Cadastre uma peça com nome, fotos e preço para começar a montar seu catálogo.'}</p><button className="ts-button ts-button--wine" onClick={() => products.length ? (setSearch(''), setCategory(''), setStatus('')) : openEditor()}>{products.length ? 'Limpar filtros' : 'Cadastrar primeiro produto'}</button></div>}
+        </article>)}</div> : <div className="ac-empty"><span aria-hidden="true">◇</span><h3>{products.length ? 'Nenhum produto encontrado' : 'Sua primeira criação começa aqui'}</h3><p>{products.length ? 'Experimente outro nome ou ajuste os filtros para encontrar suas peças.' : 'Cadastre uma peça com nome, fotos e preço para começar a montar seu catálogo.'}</p><button className="ts-button ts-button--wine" onClick={() => products.length ? (setSearch(''), setCategory('')) : openEditor()}>{products.length ? 'Limpar filtros' : 'Cadastrar primeiro produto'}</button></div>}
       </section><footer className="ac-footer">RAVERA <span>·</span> Cada detalhe conta uma história.</footer>
     </main>
     {editor && <Modal wide title={editor.id ? 'Editar produto' : 'Novo produto'} onClose={() => { if (!uploading) setEditor(null) }}><p className="ac-dialog-intro">Apresente sua criação com o cuidado que ela merece. Todos os campos são obrigatórios.</p><form ref={formRef} noValidate onSubmit={save}>

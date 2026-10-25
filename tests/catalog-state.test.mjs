@@ -7,7 +7,7 @@ import { buildQuoteMessage } from '../src/site/catalog/catalogQuote.ts'
 import { catalogProducts } from '../src/site/catalog/catalogData.ts'
 import { quotationContact, whatsappQuoteUrl, INSTAGRAM_DM_URL, WHATSAPP_NUMBER } from '../src/site/shared/contact.ts'
 
-const validIds = new Set(['memoria-em-flor', 'curva-da-materia'])
+const databaseProductId = 'ad2b88a6-578b-4f70-82d5-9d59bcf5474f'
 const first = { selectedProductIds: ['memoria-em-flor'], story: '' }
 afterEach(() => { delete globalThis.window })
 
@@ -47,29 +47,29 @@ test('removing one product preserves all other products and the exact multiline 
 test('story editing preserves whitespace, line breaks and long text without truncation', () => {
   for (const story of [' \n\t ', 'Primeira linha\n\nSegunda linha 🌸', 'História '.repeat(10000)]) {
     assert.equal(selectionReducer(first, { type: 'story', story }).story, story)
-    assert.equal(validateSelection({ ...first, story }, validIds).story, story)
+    assert.equal(validateSelection({ ...first, story }).story, story)
   }
 })
 
-test('restoring selection removes duplicates and invalid IDs, and validates the story type', () => {
-  assert.deepEqual(validateSelection({ selectedProductIds: ['memoria-em-flor', null, 2, 'removed', 'memoria-em-flor', 'curva-da-materia'], story: 'Minha história' }, validIds), { selectedProductIds: ['memoria-em-flor', 'curva-da-materia'], story: 'Minha história' })
-  for (const value of [null, [], 'wrong', 1, {}]) assert.deepEqual(validateSelection(value, validIds), emptySelection())
-  assert.deepEqual(validateSelection({ ...first, story: {} }, validIds), first)
-  assert.deepEqual(validateSelection(first, new Set()), emptySelection())
+test('restoring selection preserves dynamic product IDs, removes duplicates and non-string IDs, and validates the story type', () => {
+  assert.deepEqual(validateSelection({ selectedProductIds: ['memoria-em-flor', null, 2, databaseProductId, 'memoria-em-flor', 'curva-da-materia'], story: 'Minha história' }), { selectedProductIds: ['memoria-em-flor', databaseProductId, 'curva-da-materia'], story: 'Minha história' })
+  for (const value of [null, [], 'wrong', 1, {}]) assert.deepEqual(validateSelection(value), emptySelection())
+  assert.deepEqual(validateSelection({ ...first, story: {} }), first)
+  assert.deepEqual(validateSelection(first), first)
 })
 
-test('legacy migration discards quantity values while preserving each valid product once', () => {
-  const legacy = [{ productId: 'memoria-em-flor', quantity: 100 }, { productId: 'memoria-em-flor', quantity: 2 }, { productId: 'curva-da-materia', quantity: 'invalid' }, { productId: 'removed', quantity: 1 }, null, {}, 'invalid']
-  assert.deepEqual(migrateLegacySelection(legacy, validIds), { selectedProductIds: ['memoria-em-flor', 'curva-da-materia'], story: '' })
-  assert.deepEqual(migrateLegacySelection({}, validIds), emptySelection())
+test('legacy migration discards quantity values while preserving static and dynamic product IDs once', () => {
+  const legacy = [{ productId: 'memoria-em-flor', quantity: 100 }, { productId: 'memoria-em-flor', quantity: 2 }, { productId: 'curva-da-materia', quantity: 'invalid' }, { productId: databaseProductId, quantity: 1 }, null, {}, 'invalid']
+  assert.deepEqual(migrateLegacySelection(legacy), { selectedProductIds: ['memoria-em-flor', 'curva-da-materia', databaseProductId], story: '' })
+  assert.deepEqual(migrateLegacySelection({}), emptySelection())
 })
 
 test('v2 round trip persists both IDs and exact story; clear removes both versioned keys', () => {
   const values = mockStorage()
-  const selection = { ...first, story: 'Minha história\n\nFlores.' }
+  const selection = { selectedProductIds: [...first.selectedProductIds, databaseProductId], story: 'Minha história\n\nFlores.' }
   assert.equal(writeSelection(selection), true)
   assert.equal(values.get(SELECTION_STORAGE_KEY), JSON.stringify(selection))
-  assert.deepEqual(readSelection(validIds), { selection, available: true })
+  assert.deepEqual(readSelection(), { selection, available: true })
   values.set(LEGACY_SELECTION_STORAGE_KEY, JSON.stringify([{ productId: 'curva-da-materia', quantity: 1 }]))
   assert.equal(writeSelection(emptySelection()), true)
   assert.equal(values.has(SELECTION_STORAGE_KEY), false)
@@ -80,18 +80,18 @@ test('a story without selected products remains stored until explicitly cleared'
   const values = mockStorage()
   const selection = { selectedProductIds: [], story: 'Quero guardar esta lembrança.' }
   assert.equal(writeSelection(selection), true)
-  assert.deepEqual(readSelection(validIds), { selection, available: true })
+  assert.deepEqual(readSelection(), { selection, available: true })
   assert.equal(values.has(SELECTION_STORAGE_KEY), true)
 })
 
 test('legacy storage is migrated to v2 and existing v2 takes precedence', () => {
   const values = mockStorage()
   values.set(LEGACY_SELECTION_STORAGE_KEY, JSON.stringify([{ productId: 'memoria-em-flor', quantity: 8 }, { productId: 'memoria-em-flor', quantity: 3 }]))
-  assert.deepEqual(readSelection(validIds), { selection: first, available: true })
+  assert.deepEqual(readSelection(), { selection: first, available: true })
   assert.equal(values.get(SELECTION_STORAGE_KEY), JSON.stringify(first))
   assert.equal(values.has(LEGACY_SELECTION_STORAGE_KEY), false)
   values.set(LEGACY_SELECTION_STORAGE_KEY, JSON.stringify([{ productId: 'curva-da-materia', quantity: 1 }]))
-  assert.deepEqual(readSelection(validIds), { selection: first, available: true })
+  assert.deepEqual(readSelection(), { selection: first, available: true })
 })
 
 test('failed migration writes retain legacy data and still return usable in-memory selection', () => {
@@ -99,24 +99,24 @@ test('failed migration writes retain legacy data and still return usable in-memo
   const legacy = JSON.stringify([{ productId: 'memoria-em-flor', quantity: 8 }])
   values.set(LEGACY_SELECTION_STORAGE_KEY, legacy)
   window.sessionStorage.setItem = () => { throw new Error('Quota exceeded') }
-  assert.deepEqual(readSelection(validIds), { selection: first, available: false })
+  assert.deepEqual(readSelection(), { selection: first, available: false })
   assert.equal(values.get(LEGACY_SELECTION_STORAGE_KEY), legacy)
 })
 
 test('malformed JSON and invalid stored shapes fail gracefully', () => {
   const values = mockStorage('{broken')
-  assert.deepEqual(readSelection(validIds), { selection: emptySelection(), available: true })
+  assert.deepEqual(readSelection(), { selection: emptySelection(), available: true })
   assert.equal(values.has(SELECTION_STORAGE_KEY), false)
   values.set(LEGACY_SELECTION_STORAGE_KEY, '{broken')
-  assert.deepEqual(readSelection(validIds), { selection: emptySelection(), available: true })
+  assert.deepEqual(readSelection(), { selection: emptySelection(), available: true })
   assert.equal(values.has(LEGACY_SELECTION_STORAGE_KEY), false)
 })
 
 test('unavailable session storage and server execution do not throw', () => {
-  assert.deepEqual(readSelection(validIds), { selection: emptySelection(), available: false })
+  assert.deepEqual(readSelection(), { selection: emptySelection(), available: false })
   assert.equal(writeSelection(first), false)
   globalThis.window = { get sessionStorage() { throw new Error('Storage denied') } }
-  assert.deepEqual(readSelection(validIds), { selection: emptySelection(), available: false })
+  assert.deepEqual(readSelection(), { selection: emptySelection(), available: false })
   assert.equal(writeSelection(first), false)
 })
 
@@ -126,7 +126,7 @@ test('storage read and write failures are caught independently', () => {
     setItem() { throw new Error('Quota exceeded') },
     removeItem() { throw new Error('Remove denied') },
   } }
-  assert.deepEqual(readSelection(validIds), { selection: emptySelection(), available: false })
+  assert.deepEqual(readSelection(), { selection: emptySelection(), available: false })
   assert.equal(writeSelection(first), false)
   assert.equal(writeSelection(emptySelection()), false)
 })

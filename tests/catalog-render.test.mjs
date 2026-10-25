@@ -4,26 +4,30 @@ import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 import { createServer } from 'vite'
 
-test('catalog renders safely on the server, with empty data and optional metadata absent', async () => {
+test('dynamic catalog renders loading on the server, with safe empty selection and optional card metadata absent', async () => {
   const server = await createServer({ cacheDir: 'node_modules/.vite-ssr-test', server: { middlewareMode: true, hmr: false, watch: null }, appType: 'custom' })
   try {
     const { default: CatalogPage } = await server.ssrLoadModule('/src/site/catalog/CatalogPage.tsx')
     const { catalogProducts } = await server.ssrLoadModule('/src/site/catalog/catalogData.ts')
     const { default: ProductCard } = await server.ssrLoadModule('/src/site/catalog/ProductCard.tsx')
     const { default: Provider } = await server.ssrLoadModule('/src/site/catalog/CatalogSelectionProvider.tsx')
+    const { default: SelectionLeafButton } = await server.ssrLoadModule('/src/site/catalog/SelectionLeafButton.tsx')
     const { default: LandingThree } = await server.ssrLoadModule('/src/site/landing3/LandingThree.tsx')
     globalThis.window = { get sessionStorage() { throw new Error('Storage must never be read during render') } }
 
     const html = renderToString(createElement(CatalogPage))
-    assert.ok(html.includes('Minha seleção'))
-    assert.ok(html.includes('Memória em Flor'))
-    assert.ok(!html.includes('ts-selection-badge'))
-    assert.ok(html.includes('disabled=""'))
-    assert.ok(html.includes('Conte sua história'))
-    assert.ok(html.includes('Solicitar orçamento pelo Instagram'))
-    assert.ok(html.includes('Selecione pelo menos uma peça para enviar sua solicitação.'))
-    assert.ok(!html.includes('quote-message-text'))
-    assert.ok(!/R\$|Unidades selecionadas|ts-selection-quantity|Adicionar outra/.test(html))
+    assert.ok(html.includes('Carregando catálogo...'))
+    assert.ok(!html.includes('Memória em Flor'))
+
+    const selection = renderToString(createElement(Provider, null, createElement(SelectionLeafButton)))
+    assert.ok(selection.includes('Minha seleção'))
+    assert.ok(!selection.includes('ts-selection-badge'))
+    assert.ok(selection.includes('disabled=""'))
+    assert.ok(selection.includes('Conte sua história'))
+    assert.ok(selection.includes('Solicitar orçamento pelo Instagram'))
+    assert.ok(selection.includes('Selecione pelo menos uma peça para enviar sua solicitação.'))
+    assert.ok(!selection.includes('quote-message-text'))
+    assert.ok(!/R\$|Unidades selecionadas|ts-selection-quantity|Adicionar outra/.test(selection))
 
     const home = renderToString(createElement(LandingThree))
     assert.ok(home.includes('id="catalogo"'))
@@ -36,16 +40,8 @@ test('catalog renders safely on the server, with empty data and optional metadat
     assert.ok(!card.includes('ts-catalog-price'))
 
     const missing = renderToString(createElement(CatalogPage, { productSlug: 'removed-product' }))
-    assert.ok(missing.includes('Peça não encontrada.'))
-    const original = [...catalogProducts]
-    catalogProducts.splice(0)
-    try {
-      const empty = renderToString(createElement(CatalogPage))
-      assert.ok(empty.includes('Nenhuma peça no catálogo no momento.'))
-      assert.ok(empty.includes('Minha seleção'))
-    } finally {
-      catalogProducts.push(...original)
-    }
+    assert.ok(missing.includes('Carregando catálogo...'))
+    assert.ok(!missing.includes('Peça não encontrada.'))
   } finally {
     delete globalThis.window
     await server.close()

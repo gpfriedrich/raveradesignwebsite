@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useReducer, useState, type ReactNode }
 import { CatalogSelectionContext } from './catalogSelectionContext'
 import { selectionReducer, type SelectionAction } from './catalogSelectionReducer'
 import { emptySelection, readSelection, writeSelection } from './catalogStorage'
-import { fetchProducts } from './catalogService'
 import type { CatalogSelectionDraft } from './catalogTypes'
 
 type SelectionState = { selection: CatalogSelectionDraft; ready: boolean; storageAvailable: boolean }
@@ -20,13 +19,8 @@ export default function CatalogSelectionProvider({ children }: { children: React
   const [announcement, setAnnouncement] = useState({ message: '', version: 0 })
 
   useEffect(() => {
-    const init = async () => {
-      // We no longer use a static validIds set.
-      // We read the stored selection and restore it.
-      const stored = readSelection(new Set()) // passing empty set as we don't filter by static list anymore
-      dispatch({ type: 'restore', selection: stored.selection, available: stored.available })
-    }
-    init()
+    const stored = readSelection()
+    dispatch({ type: 'restore', selection: stored.selection, available: stored.available })
   }, [])
 
   useEffect(() => {

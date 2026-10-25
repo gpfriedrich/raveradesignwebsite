@@ -2,7 +2,8 @@ import type { CatalogProduct } from './catalogTypes'
 
 // Dados do catálogo inicial. A cópia histórica da Landing 1 permanece intacta.
 // As mesmas fotografias já possuem versões WebP na biblioteca oficial.
-export const catalogProducts: CatalogProduct[] = [
+// O catálogo estático histórico não inclui preços; os produtos do banco incluem.
+export const catalogProducts: Omit<CatalogProduct, 'price'>[] = [
   {
     id: 'memoria-em-flor',
     name: 'Memória em Flor',
