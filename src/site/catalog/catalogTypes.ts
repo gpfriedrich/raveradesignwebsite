@@ -1,7 +1,7 @@
 export type DbProduct = {
   id: string
   name: string
-  image_src: string
+  images: string[]
   image_alt: string
   image_width: number
   image_height: number
@@ -15,7 +15,7 @@ export type DbProduct = {
 export type CatalogProduct = {
   id: string
   name: string
-  image: { src: string; alt: string; width: number; height: number }
+  images: { src: string; alt: string; width: number; height: number }[]
   summary?: string
   category?: string
   material?: string

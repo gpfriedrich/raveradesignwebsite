@@ -19,6 +19,7 @@ export default function CatalogPage({ productSlug }: { productSlug?: string }) {
   const [products, setProducts] = useState<CatalogProduct[]>([])
   const [product, setProduct] = useState<CatalogProduct | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [activeIndex, setActiveIndex] = useState(0)
 
   useSectionReveal(rootRef)
 
@@ -29,6 +30,7 @@ export default function CatalogPage({ productSlug }: { productSlug?: string }) {
         if (productSlug) {
           const p = await fetchProductById(productSlug)
           setProduct(p)
+          setActiveIndex(0)
         } else {
           const ps = await fetchProducts()
           setProducts(ps)
@@ -64,7 +66,45 @@ export default function CatalogPage({ productSlug }: { productSlug?: string }) {
             <>
               <div className="ts-catalog-detail-bar ts-dark"><div className="ts-container"><a className="ts-link" href={`${CATALOG_PATH}/`}><span aria-hidden="true">←</span> Voltar ao catálogo</a></div></div>
               <article className="ts-container ts-catalog-detail" aria-labelledby="ts-product-title">
-                <div className="ts-catalog-detail-image"><CatalogImage image={product.image} eager /></div>
+                <div className="ts-catalog-detail-carousel-wrapper">
+                  <div className="ts-catalog-detail-carousel">
+                    {product.images.map((img, idx) => (
+                      <div
+                        key={idx}
+                        className={`ts-catalog-carousel-slide ${idx === activeIndex ? 'active' : ''}`}
+                        onClick={() => setActiveIndex(idx)}
+                      >
+                        <CatalogImage image={img} eager />
+                      </div>
+                    ))}
+                    <button
+                      className="ts-catalog-nav-btn ts-catalog-nav-prev"
+                      onClick={() => setActiveIndex(prev => (prev === 0 ? product.images.length - 1 : prev - 1))}
+                      aria-label="Imagem anterior"
+                    >
+                      <span aria-hidden="true">&#8592;</span>
+                    </button>
+                    <button
+                      className="ts-catalog-nav-btn ts-catalog-nav-next"
+                      onClick={() => setActiveIndex(prev => (prev === product.images.length - 1 ? 0 : prev + 1))}
+                      aria-label="Próxima imagem"
+                    >
+                      <span aria-hidden="true">&#8594;</span>
+                    </button>
+                  </div>
+                  <div className="ts-catalog-detail-thumbnails">
+                    {product.images.map((img, idx) => (
+                      <button
+                        key={idx}
+                        className={`ts-catalog-thumbnail ${idx === activeIndex ? 'active' : ''}`}
+                        onClick={() => setActiveIndex(idx)}
+                        aria-label={`Ver imagem ${idx + 1}`}
+                      >
+                        <img src={img.src} alt={img.alt} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 <div className="ts-catalog-detail-copy">
                   <p className="ts-kicker">Peça autoral</p>
                   <h1 id="ts-product-title">{product.name}</h1>
