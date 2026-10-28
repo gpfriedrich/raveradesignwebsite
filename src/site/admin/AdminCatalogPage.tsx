@@ -50,7 +50,7 @@ export default function AdminCatalogPage() {
         description: p.summary || '',
         price: p.price,
         category: p.category || '',
-        images: [p.image.src],
+        images: p.images.map(img => img.src),
       })))
     }
     load()
@@ -79,10 +79,11 @@ export default function AdminCatalogPage() {
     }
 
     try {
-      // Ensure image is a valid URL or Base64, and never a local file path
-      const imageSrc = draft.images[0]
-      if (imageSrc && (imageSrc.startsWith('file://') || (imageSrc.startsWith('/') && !imageSrc.startsWith('/ravera')))) {
-         throw new Error('Caminho de imagem inválido.')
+      // Ensure images are valid URLs or Base64, and never local file paths
+      for (const imageSrc of draft.images) {
+        if (imageSrc && (imageSrc.startsWith('file://') || (imageSrc.startsWith('/') && !imageSrc.startsWith('/ravera')))) {
+           throw new Error('Caminho de imagem inválido.')
+        }
       }
 
       const productData: DbProduct = {
@@ -91,7 +92,7 @@ export default function AdminCatalogPage() {
         summary: draft.description.trim(),
         category: draft.category,
         price,
-        image_src: imageSrc,
+        images: draft.images,
         image_alt: draft.name.trim(),
         image_width: 0,
         image_height: 0,
@@ -110,11 +111,11 @@ export default function AdminCatalogPage() {
         description: p.summary || '',
         price: p.price,
         category: p.category || '',
-        images: [p.image.src],
+        images: p.images.map(img => img.src),
       })))
     } catch (e) {
-      console.error(e)
-      setNotice('Erro ao salvar produto. Verifique as imagens.')
+      console.error('Error saving product:', e)
+      setNotice(`Erro ao salvar produto: ${e instanceof Error ? e.message : 'Verifique as imagens.'}`)
     }
   }
   async function upload(files: FileList | null) {

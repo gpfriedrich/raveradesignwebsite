@@ -11,7 +11,11 @@ export function selectionReducer(selection: CatalogSelectionDraft, action: Selec
   if (action.type === 'hydrate') return action.selection
   if (action.type === 'clear') return emptySelection()
   if (action.type === 'story') return { ...selection, story: action.story }
-  if (action.type === 'remove') return { ...selection, selectedProductIds: selection.selectedProductIds.filter((id) => id !== action.productId) }
+  if (action.type === 'remove') {
+    if (!action.productId) return selection
+    return { ...selection, selectedProductIds: selection.selectedProductIds.filter((id) => id !== action.productId) }
+  }
+  if (!action.productId) return selection
   if (selection.selectedProductIds.includes(action.productId)) return selection
   return { ...selection, selectedProductIds: [...selection.selectedProductIds, action.productId] }
 }
