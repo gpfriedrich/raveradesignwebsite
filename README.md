@@ -39,6 +39,8 @@ Essas duas rotas fazem parte do build para consulta direta, mas não aparecem no
 
 ## Catálogo oficial
 
+Na Vercel, `vercel.json` encaminha as rotas `/prototipos/catalogo/:path*` para a entrada HTML do catálogo. Isso permite abrir e atualizar os detalhes de produtos cadastrados no banco, cujos IDs não possuem um HTML individual gerado pelo build. O React lê o endereço original e busca o produto pelo ID. Alterações nessa configuração exigem um novo deploy.
+
 A seção `#catalogo` substitui a antiga seção entre “A origem” e “Coleção” em `/`. O catálogo completo mantém o endereço existente `/prototipos/catalogo/` e as cinco páginas `/prototipos/catalogo/<slug>/`; o nome do caminho foi preservado para manter os links existentes. Essas páginas agora usam a identidade e os componentes oficiais, sem links públicos para as duas landings arquivadas.
 
 A seção “Monte seu pedido” foi removida da homepage. A seleção e o pedido de orçamento existem exclusivamente no catálogo. Cada peça pode ser selecionada uma única vez; a folha conta peças distintas. Não há preços ou controles de quantidade.

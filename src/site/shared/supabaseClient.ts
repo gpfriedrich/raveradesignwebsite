@@ -11,6 +11,7 @@ console.log('[SupabaseClient] Checking config:', {
 })
 
 const hasConfig = !!(supabaseUrl && supabaseAnonKey)
+const unavailable = async () => ({ data: null, error: new Error('Supabase not configured') })
 
 // Criamos um objeto que imita a interface do cliente do Supabase para evitar crashes
 // quando as chaves não estão presentes.
@@ -23,10 +24,13 @@ const MockSupabaseClient = {
   },
   from: () => ({
     select: () => ({
+      order: unavailable,
       eq: () => ({
-        single: async () => ({ data: null, error: { message: 'Supabase not configured' } }),
+        single: unavailable,
       }),
     }),
+    upsert: unavailable,
+    delete: () => ({ eq: unavailable }),
   }),
 } as any
 
