@@ -4,7 +4,7 @@
 CREATE TABLE IF NOT EXISTS products (
   id text PRIMARY KEY,
   name text NOT NULL,
-  image_src text NOT NULL,
+  images text[] NOT NULL DEFAULT '{}',
   image_alt text,
   image_width integer,
   image_height integer,

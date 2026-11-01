@@ -68,13 +68,28 @@
 }
 
 .ts-catalog-preview-image img,
-.ts-catalog-card-image img,
-.ts-catalog-detail-image img,
+.ts-catalog-carousel-slide img,
 .ts-selection-thumbnail img {
   width: 100%;
   height: 100%;
   object-fit: contain;
   transition: opacity .3s var(--ease);
+}
+
+.ts-catalog-card-image {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: 2px;
+  background: var(--papel);
+}
+
+.ts-catalog-card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity .5s var(--ease);
 }
 
 .ts-catalog-preview a:hover img,
@@ -174,7 +189,83 @@
   padding-block: clamp(48px, 6vw, 88px) clamp(96px, 12vw, 160px);
 }
 
-.ts-catalog-detail-image { aspect-ratio: 3 / 4; max-height: 620px; }
+.ts-catalog-detail-carousel-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.ts-catalog-detail-carousel {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  max-height: 620px;
+  overflow: hidden;
+  border: 1px solid var(--linha);
+  border-radius: 2px;
+  background: var(--papel);
+}
+
+.ts-catalog-carousel-slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .4s var(--ease);
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ts-catalog-carousel-slide.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ts-catalog-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--linha);
+  background: rgba(255, 255, 255, .7);
+  color: var(--vinho);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: background .2s;
+}
+
+.ts-catalog-nav-btn:hover { background: white; }
+.ts-catalog-nav-prev { left: 12px; }
+.ts-catalog-nav-next { right: 12px; }
+
+.ts-catalog-detail-thumbnails {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.ts-catalog-thumbnail {
+  width: 64px;
+  height: 80px;
+  padding: 0;
+  border: 1px solid var(--linha);
+  border-radius: 2px;
+  background: var(--papel);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color .2s;
+}
+
+.ts-catalog-thumbnail.active { border-color: var(--vinho); box-shadow: 0 0 0 2px var(--perola), 0 0 0 3px var(--vinho); }
+.ts-catalog-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+
 .ts-catalog-detail-copy { min-width: 0; }
 .ts-catalog-detail-copy h1 { font-size: clamp(2.8rem, 5vw, 4.6rem); margin-block: 24px; }
 .ts-catalog-detail-copy dl { margin-block: 32px; }

@@ -32,6 +32,7 @@ export default function CatalogSelectionProvider({ children }: { children: React
   }, [])
 
   const add = useCallback((productId: string) => {
+    if (!productId) return
     if (selectedProductIds.includes(productId)) return
     dispatch({ type: 'add', productId })
     announce('Produto adicionado à seleção.')

@@ -58,7 +58,7 @@ const products = [
 ]
 
 const instagram = 'https://www.instagram.com/ravera.designn/'
-const catalogHref = '/prototipos/catalogo'
+const catalogHref = '/prototipos/catalogo/'
 
 function BrandMark() {
   return (
@@ -102,8 +102,8 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
     return (
       <div className="ravera rv-one rv1-catalog-page" id="topo">
         <header className="rv1-simple-header rv-container">
-          <a href="/prototipos/catalogo" className="rv1-brand" aria-label="RAVERA, início"><BrandMark /></a>
-          <nav aria-label="Navegação do catálogo"><a href="/prototipos/landing1">Início</a><a href="/prototipos/catalogo">Catálogo</a><a href="/prototipos/landing1#contato">Contato</a></nav>
+          <a href="/prototipos/catalogo/" className="rv1-brand" aria-label="RAVERA, início"><BrandMark /></a>
+          <nav aria-label="Navegação do catálogo"><a href="/prototipos/landing1">Início</a><a href="/prototipos/catalogo/">Catálogo</a><a href="/prototipos/landing1#contato">Contato</a></nav>
         </header>
         <main>
           <section className="rv1-catalog-hero rv-container">
@@ -125,14 +125,14 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
       <div className="ravera rv-one rv1-product-page" id="topo">
         <header className="rv1-simple-header rv-container">
           <a href="/prototipos/landing1" className="rv1-brand" aria-label="RAVERA, início"><BrandMark /></a>
-          <nav aria-label="Navegação do produto"><a href="/prototipos/landing1">Início</a><a href="/prototipos/catalogo">Catálogo</a><a href="/prototipos/landing1#contato">Contato</a></nav>
+          <nav aria-label="Navegação do produto"><a href="/prototipos/landing1">Início</a><a href="/prototipos/catalogo/">Catálogo</a><a href="/prototipos/landing1#contato">Contato</a></nav>
         </header>
         <main className="rv1-product-detail rv-container">
           <div className="rv1-product-detail-image">
             <img src={product.image} alt={product.name} />
           </div>
           <section className="rv1-product-detail-copy" aria-labelledby="product-title">
-            <a className="rv1-back-link" href="/prototipos/catalogo">Voltar ao catálogo</a>
+            <a className="rv1-back-link" href="/prototipos/catalogo/">Voltar ao catálogo</a>
             <p className="rv-kicker">Peça autoral</p>
             <h1 id="product-title">{product.name}</h1>
             <p className="rv1-product-lead">{product.summary}</p>
@@ -155,7 +155,7 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
       <header className="rv1-header">
         <nav aria-label="Navegação principal" className="rv1-nav rv1-nav-left"><a href="#colecao">Coleção</a><a href="#visao">A marca</a></nav>
         <a href="#topo" className="rv1-brand" aria-label="RAVERA, início"><BrandMark /></a>
-        <nav aria-label="Navegação complementar" className="rv1-nav rv1-nav-right"><a href="/prototipos/catalogo">Catálogo</a><a href="#contato">Contato</a></nav>
+        <nav aria-label="Navegação complementar" className="rv1-nav rv1-nav-right"><a href="/prototipos/catalogo/">Catálogo</a><a href="#contato">Contato</a></nav>
       </header>
       <main id="conteudo">
         <section className="rv1-hero rv-container" aria-labelledby="rv1-title">
@@ -164,7 +164,7 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
             <h1 id="rv1-title">Objetos com presença, memória e acabamento autoral.</h1>
             <p className="rv1-intro">Lorem ipsum dolor sit amet, consectetur adipiscing elit. A RAVERA cria peças decorativas e afetivas para ambientes que pedem silêncio, matéria e intenção.</p>
             <div className="rv1-hero-actions">
-              <a className="rv-outline-link" href="/prototipos/catalogo">Ver catálogo</a>
+              <a className="rv-outline-link" href="/prototipos/catalogo/">Ver catálogo</a>
               <a className="rv-text-link" href={catalogHref}>Conhecer a coleção <span aria-hidden="true">↗</span></a>
             </div>
           </div>
@@ -195,7 +195,7 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
             <div className="rv1-copy-stack">
               <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam mattis, justo sed volutpat interdum, neque lorem feugiat libero, sed volutpat risus erat sed magna.</p>
               <p>Morbi vitae posuere neque. A peça certa cria pausa, conduz o olhar e transforma pequenos rituais em presença cotidiana.</p>
-              <a className="rv-text-link" href="/prototipos/catalogo">Explorar peças disponíveis <span aria-hidden="true">↗</span></a>
+              <a className="rv-text-link" href="/prototipos/catalogo/">Explorar peças disponíveis <span aria-hidden="true">↗</span></a>
             </div>
           </div>
         </section>
@@ -230,7 +230,7 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
                 <li>Possibilidade de conversa para encomendas</li>
               </ul>
 
-              <a className="rv-outline-link" href="/prototipos/catalogo">
+              <a className="rv-outline-link" href="/prototipos/catalogo/">
                 Escolher uma peça
               </a>
             </div>
@@ -250,7 +250,7 @@ function DirectionOne({ view = 'home', productSlug }: { view?: LandingOneView; p
           <div className="rv1-contact-copy">
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Conte o que você procura: presente, decoração, lembrança afetiva ou uma peça sob medida.</p>
             <div className="rv1-contact-actions">
-              <a className="rv-outline-link" href="/prototipos/catalogo">Abrir catálogo</a>
+              <a className="rv-outline-link" href="/prototipos/catalogo/">Abrir catálogo</a>
               <InstagramLink className="rv-text-link">Instagram</InstagramLink>
             </div>
           </div>

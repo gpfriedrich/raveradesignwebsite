@@ -43,7 +43,7 @@ export default function CatalogSection() {
           {products.slice(0, 5).map((product, index) => (
             <li key={product.id}>
               <a href={productHref(product.id)}>
-                <div className="ts-catalog-preview-image"><CatalogImage image={product.image} /></div>
+                <div className="ts-catalog-preview-image"><CatalogImage image={product.images[0]} /></div>
                 <div className="ts-catalog-preview-caption">
                   <span aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                   <h3>{product.name}</h3>

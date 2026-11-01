@@ -5,12 +5,12 @@ export function mapDbToCatalog(dbProduct: DbProduct): CatalogProduct {
   return {
     id: dbProduct.id,
     name: dbProduct.name,
-    image: {
-      src: dbProduct.image_src,
+    images: dbProduct.images.map(src => ({
+      src,
       alt: dbProduct.image_alt,
       width: dbProduct.image_width,
       height: dbProduct.image_height,
-    },
+    })),
     summary: dbProduct.summary,
     category: dbProduct.category,
     material: dbProduct.material,
@@ -23,10 +23,10 @@ export function mapCatalogToDb(product: CatalogProduct): DbProduct {
   return {
     id: product.id,
     name: product.name,
-    image_src: product.image.src,
-    image_alt: product.image.alt,
-    image_width: product.image.width,
-    image_height: product.image.height,
+    images: product.images.map(img => img.src),
+    image_alt: product.images[0]?.alt || '',
+    image_width: product.images[0]?.width || 0,
+    image_height: product.images[0]?.height || 0,
     summary: product.summary,
     category: product.category,
     material: product.material,
