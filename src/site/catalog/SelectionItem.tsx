@@ -6,7 +6,7 @@ export default function SelectionItem({ product }: { product: CatalogProduct }) 
   const { remove } = useCatalogSelection()
   return (
     <li className="ts-selection-item">
-      <div className="ts-selection-thumbnail"><CatalogImage image={product.image} /></div>
+      <div className="ts-selection-thumbnail"><CatalogImage image={product.images[0]} /></div>
       <div className="ts-selection-item-copy">
         <h3>{product.name}</h3>
         {product.category && <p className="ts-selection-category">{product.category}</p>}

@@ -9,6 +9,7 @@ import { fetchProducts, fetchProductById } from './catalogService'
 import type { CatalogProduct } from './catalogTypes'
 import { CATALOG_PATH } from './catalogRoutes'
 import CatalogImage from './CatalogImage'
+import { formatProductPrice } from './productPricing'
 import ProductCard from './ProductCard'
 import SelectionAction from './SelectionAction'
 import SelectionLeafButton from './SelectionLeafButton'
@@ -110,6 +111,7 @@ export default function CatalogPage({ productSlug }: { productSlug?: string }) {
                   <h1 id="ts-product-title">{product.name}</h1>
                   {product.summary && <p className="ts-catalog-summary">{product.summary}</p>}
                   <dl>
+                    <div><dt>Preço</dt><dd>{formatProductPrice(product.price)}</dd></div>
                     {product.material && <div><dt>Material</dt><dd>{product.material}</dd></div>}
                     {product.size && <div><dt>Dimensões</dt><dd>{product.size}</dd></div>}
                   </dl>

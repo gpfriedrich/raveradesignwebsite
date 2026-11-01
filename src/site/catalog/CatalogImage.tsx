@@ -2,10 +2,10 @@ import { useState } from 'react'
 import type { CatalogProduct } from './catalogTypes'
 import LeafIcon from './LeafIcon'
 
-export default function CatalogImage({ image, eager = false }: { image: CatalogProduct['image']; eager?: boolean }) {
+export default function CatalogImage({ image, eager = false }: { image: CatalogProduct['images'][number] | undefined; eager?: boolean }) {
   const [failed, setFailed] = useState(false)
-  return failed ? (
-    <span className="ts-catalog-image-fallback" role="img" aria-label={`${image.alt}. Imagem indisponível.`}>
+  return failed || !image ? (
+    <span className="ts-catalog-image-fallback" role="img" aria-label={`${image?.alt || 'Produto'}. Imagem indisponível.`}>
       <LeafIcon />
       <span>Imagem indisponível</span>
     </span>

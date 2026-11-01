@@ -2,15 +2,15 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'rea
 import RaveraLogo from '../shared/RaveraLogo'
 import useAdminSmoothScroll from './useAdminSmoothScroll'
 import { fetchAllProducts, upsertProduct, deleteProduct } from '../catalog/catalogService'
+import { formatProductPrice, parseFixedPrice } from '../catalog/productPricing'
 import type { DbProduct } from '../catalog/catalogTypes'
 import '../landing3/landing3.css'
 import './adminCatalog.css'
 
 const categories = ['Decoração', 'Porta-joias', 'Lembranças', 'Acessórios']
-type Product = { id: string; name: string; description: string; price: number; category: string; images: string[] }
-type Draft = Omit<Product, 'id' | 'price'> & { price: string }
-const emptyDraft = (): Draft => ({ name: '', description: '', price: '', category: '', images: [] })
-const money = (price: number) => price.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+type Product = { id: string; name: string; description: string; price: number | null; category: string; images: string[] }
+type Draft = Omit<Product, 'id' | 'price'> & { price: string; pricingMode: 'fixed' | 'quote' }
+const emptyDraft = (): Draft => ({ name: '', description: '', price: '', pricingMode: 'fixed', category: '', images: [] })
 
 function Modal({ children, title, onClose, wide = false }: { children: ReactNode; title: string; onClose: () => void; wide?: boolean }) {
   const ref = useRef<HTMLDialogElement>(null)
@@ -37,6 +37,9 @@ export default function AdminCatalogPage() {
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [imageError, setImageError] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const savingRef = useRef(false)
+  const productIdRef = useRef('')
   const [deleting, setDeleting] = useState<Product | null>(null)
   const [notice, setNotice] = useState('')
   const formRef = useRef<HTMLFormElement>(null)
@@ -60,16 +63,19 @@ export default function AdminCatalogPage() {
   const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   const filtered = products.filter(p => normalize(p.name).includes(normalize(search.trim())) && (!category || p.category === category))
   function openEditor(product?: Product) {
-    setDraft(product ? { ...product, images: [...product.images], price: product.price.toFixed(2).replace('.', ',') } : emptyDraft())
+    if (savingRef.current) return
+    productIdRef.current = product?.id ?? crypto.randomUUID()
+    setDraft(product ? { ...product, images: [...product.images], price: product.price == null ? '' : product.price.toFixed(2).replace('.', ','), pricingMode: product.price == null ? 'quote' : 'fixed' } : emptyDraft())
     setErrors({}); setImageError(''); setEditor(product ? { id: product.id } : {})
   }
   async function save(event: FormEvent) {
     event.preventDefault()
-    const price = Number(draft.price.replace(',', '.'))
+    if (savingRef.current || uploading || !editor) return
+    const price = draft.pricingMode === 'fixed' ? parseFixedPrice(draft.price) : null
     const nextErrors: Record<string, string> = {}
     if (!draft.name.trim()) nextErrors.name = 'Informe o nome do produto.'
     if (!draft.description.trim()) nextErrors.description = 'Conte um pouco sobre esta peça.'
-    if (!draft.price.trim() || !Number.isFinite(price) || price <= 0 || price > 999999.99 || !/^\d+(?:[.,]\d{1,2})?$/.test(draft.price.trim())) nextErrors.price = 'Informe um preço entre R$ 0,01 e R$ 999.999,99, com até duas casas decimais.'
+    if (draft.pricingMode === 'fixed' && price === null) nextErrors.price = 'Informe um preço entre R$ 0,01 e R$ 999.999,99, com até duas casas decimais.'
     if (!draft.category) nextErrors.category = 'Selecione uma categoria.'
     if (!draft.images.length) nextErrors.images = 'Adicione pelo menos uma imagem.'
     setErrors(nextErrors)
@@ -78,6 +84,8 @@ export default function AdminCatalogPage() {
       return
     }
 
+    savingRef.current = true
+    setSaving(true)
     try {
       // Ensure images are valid URLs or Base64, and never local file paths
       for (const imageSrc of draft.images) {
@@ -87,7 +95,7 @@ export default function AdminCatalogPage() {
       }
 
       const productData: DbProduct = {
-        id: editor?.id ?? crypto.randomUUID(),
+        id: productIdRef.current,
         name: draft.name.trim(),
         summary: draft.description.trim(),
         category: draft.category,
@@ -116,6 +124,9 @@ export default function AdminCatalogPage() {
     } catch (e) {
       console.error('Error saving product:', e)
       setNotice(`Erro ao salvar produto: ${e instanceof Error ? e.message : 'Verifique as imagens.'}`)
+    } finally {
+      savingRef.current = false
+      setSaving(false)
     }
   }
   async function upload(files: FileList | null) {
@@ -153,19 +164,20 @@ export default function AdminCatalogPage() {
         <div className="ac-filters"><label>Buscar produto<input type="search" placeholder="Buscar pelo nome…" value={search} onChange={e => setSearch(e.target.value)} /></label><label>Categoria<select value={category} onChange={e => setCategory(e.target.value)}><option value="">Todas as categorias</option>{categories.map(c => <option key={c}>{c}</option>)}</select></label>{(search || category) && <button className="ac-text-button" onClick={() => { setSearch(''); setCategory('') }}>Limpar filtros</button>}</div>
         <div className="ac-list-heading"><h2>Suas criações</h2><span aria-live="polite">{filtered.length} {filtered.length === 1 ? 'produto' : 'produtos'}</span></div>
         {filtered.length ? <div className="ac-products">{filtered.map(product => <article className="ac-product" key={product.id}>
-          <img src={product.images[0]} alt={product.name} /><div className="ac-product-info"><span className="ac-category">{product.category}</span><h3>{product.name}</h3><span className="ac-price">{money(product.price)}</span></div>
+          <img src={product.images[0]} alt={product.name} /><div className="ac-product-info"><span className="ac-category">{product.category}</span><h3>{product.name}</h3><span className="ac-price">{formatProductPrice(product.price)}</span></div>
           <div className="ac-actions"><button onClick={() => openEditor(product)} aria-label={`Editar ${product.name}`}>Editar</button><button className="ac-delete" aria-label={`Excluir ${product.name}`} onClick={() => setDeleting(product)}>Excluir</button></div>
         </article>)}</div> : <div className="ac-empty"><span aria-hidden="true">◇</span><h3>{products.length ? 'Nenhum produto encontrado' : 'Sua primeira criação começa aqui'}</h3><p>{products.length ? 'Experimente outro nome ou ajuste os filtros para encontrar suas peças.' : 'Cadastre uma peça com nome, fotos e preço para começar a montar seu catálogo.'}</p><button className="ts-button ts-button--wine" onClick={() => products.length ? (setSearch(''), setCategory('')) : openEditor()}>{products.length ? 'Limpar filtros' : 'Cadastrar primeiro produto'}</button></div>}
       </section><footer className="ac-footer">RAVERA <span>·</span> Cada detalhe conta uma história.</footer>
     </main>
-    {editor && <Modal wide title={editor.id ? 'Editar produto' : 'Novo produto'} onClose={() => { if (!uploading) setEditor(null) }}><p className="ac-dialog-intro">Apresente sua criação com o cuidado que ela merece. Todos os campos são obrigatórios.</p><form ref={formRef} noValidate onSubmit={save}>
-      <div className="ac-form-grid"><label className="ac-full">Nome do produto<input autoFocus maxLength={100} required value={draft.name} {...fieldProps('name')} onChange={e => setDraft({ ...draft, name: e.target.value })} placeholder="Ex.: Porta-joias floral" />{fieldError('name')}</label>
+    {editor && <Modal wide title={editor.id ? 'Editar produto' : 'Novo produto'} onClose={() => { if (!uploading && !savingRef.current) setEditor(null) }}><p className="ac-dialog-intro">Apresente sua criação com o cuidado que ela merece. O valor é obrigatório apenas para produtos com preço fixo.</p><form ref={formRef} noValidate onSubmit={save} aria-busy={saving}>
+      <fieldset className="ac-form-grid" disabled={saving}><label className="ac-full">Nome do produto<input autoFocus maxLength={100} required value={draft.name} {...fieldProps('name')} onChange={e => setDraft({ ...draft, name: e.target.value })} placeholder="Ex.: Porta-joias floral" />{fieldError('name')}</label>
       <label className="ac-full">Descrição<textarea rows={3} maxLength={2000} required value={draft.description} {...fieldProps('description')} onChange={e => setDraft({ ...draft, description: e.target.value })} placeholder="Materiais, acabamento e o que torna esta peça especial…" />{fieldError('description')}</label>
-      <label>Preço (R$)<input inputMode="decimal" required value={draft.price} {...fieldProps('price')} onChange={e => setDraft({ ...draft, price: e.target.value })} placeholder="0,00" />{fieldError('price')}</label>
+      <label>Tipo de preço<select value={draft.pricingMode} onChange={e => { setDraft({ ...draft, pricingMode: e.target.value as Draft['pricingMode'] }); setErrors(current => ({ ...current, price: '' })) }}><option value="fixed">Preço fixo</option><option value="quote">Sob orçamento</option></select></label>
+      {draft.pricingMode === 'fixed' && <label>Preço (R$)<input inputMode="decimal" required value={draft.price} {...fieldProps('price')} onChange={e => setDraft({ ...draft, price: e.target.value })} placeholder="0,00" />{fieldError('price')}</label>}
       <label>Categoria<select required value={draft.category} {...fieldProps('category')} onChange={e => setDraft({ ...draft, category: e.target.value })}><option value="">Selecione uma categoria</option>{categories.map(c => <option key={c}>{c}</option>)}</select>{fieldError('category')}</label>
       <div className="ac-full"><label htmlFor="product-images">Imagens do produto</label><p className="ac-help" id="images-help">Até 5 imagens · JPG, PNG ou WebP · até 5 MB cada. A primeira será a capa.</p><div className="ac-previews">{draft.images.map((src, index) => <div key={src}><img src={src} alt={`Prévia ${index + 1}${index === 0 ? ' — capa' : ''}`} /><button type="button" aria-label={`Remover imagem ${index + 1}`} disabled={uploading} onClick={() => setDraft(current => ({ ...current, images: current.images.filter((_, i) => i !== index) }))}>×</button>{index === 0 && <small>Capa</small>}</div>)}</div><input id="product-images" type="file" accept="image/jpeg,image/png,image/webp" multiple disabled={uploading} {...fieldProps('images')} aria-describedby={[ 'images-help', errors.images ? 'error-images' : '', imageError ? 'image-error' : '' ].filter(Boolean).join(' ')} onChange={e => { void upload(e.target.files); e.target.value = '' }} />{fieldError('images')}{imageError && <p id="image-error" className="ac-error" role="alert">{imageError}</p>}{uploading && <p role="status">Preparando imagens…</p>}</div>
-      <div className="ac-dialog-actions"><button type="button" className="ac-secondary" disabled={uploading} onClick={() => setEditor(null)}>Cancelar</button><button type="submit" className="ts-button ts-button--wine" disabled={uploading}>{editor.id ? 'Salvar alterações' : 'Cadastrar produto'}</button></div>
-    </div>
+      <div className="ac-dialog-actions"><button type="button" className="ac-secondary" disabled={uploading || saving} onClick={() => setEditor(null)}>Cancelar</button><button type="submit" className="ts-button ts-button--wine" disabled={uploading || saving}>{saving ? 'Salvando…' : editor.id ? 'Salvar alterações' : 'Cadastrar produto'}</button></div>
+    </fieldset>
     </form></Modal>}
     {deleting && <Modal title="Excluir produto?" onClose={() => setDeleting(null)}><p className="ac-delete-copy">A peça <strong>{deleting.name}</strong> será removida do banco de dados. Esta ação não pode ser desfeita.</p><div className="ac-dialog-actions"><button autoFocus className="ac-secondary" onClick={() => setDeleting(null)}>Cancelar</button><button className="ac-danger" onClick={async () => {
       try {

@@ -19,7 +19,7 @@ export default function ProductCard({ product, index }: { product: CatalogProduc
         setImageIndex(prev => (prev + 1) % product.images.length)
         setIsTransitioning(false)
       }, 500)
-    }, 3000)
+    }, 6000)
 
     return () => clearInterval(timer)
   }, [product])

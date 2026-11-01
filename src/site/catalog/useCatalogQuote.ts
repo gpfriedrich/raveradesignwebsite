@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { INSTAGRAM_DM_URL } from '../shared/contact'
 import { fetchProducts } from './catalogService'
+import type { CatalogProduct } from './catalogTypes'
 import { buildQuoteMessage } from './catalogQuote'
 import { useCatalogSelection } from './catalogSelectionContext'
 import { copyMessageToClipboard } from './copyMessageToClipboard'
@@ -16,7 +17,7 @@ export type CopyFeedback = { message: string; blocked: boolean; version: number 
 
 export default function useCatalogQuote() {
   const { selectedProductIds, story, ready } = useCatalogSelection()
-  const [allProducts, setAllProducts] = useState<any[]>([])
+  const [allProducts, setAllProducts] = useState<CatalogProduct[]>([])
 
   useEffect(() => {
     async function load() {

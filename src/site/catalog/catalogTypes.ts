@@ -9,7 +9,7 @@ export type DbProduct = {
   category?: string
   material?: string
   size?: string
-  price: number
+  price: number | null
 }
 
 export type CatalogProduct = {
@@ -20,7 +20,7 @@ export type CatalogProduct = {
   category?: string
   material?: string
   size?: string
-  price: number
+  price: number | null
 }
 
 export type CatalogSelectionDraft = { selectedProductIds: string[]; story: string }

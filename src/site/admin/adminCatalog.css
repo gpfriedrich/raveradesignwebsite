@@ -65,7 +65,7 @@ body:has(.ac) { margin: 0; }
 .ac-dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
 .ac-dialog h2 { font-size: 2.3rem; }
 .ac-dialog-intro { color: var(--grafite); font-size: .88rem; margin: 8px 0 24px !important; }
-.ac-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.ac-form-grid { border: 0; padding: 0; margin: 0; min-width: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 .ac-full { grid-column: 1 / -1; min-width: 0; }
 .ac [aria-invalid=true] { border-color: #9a3549 !important; }
 .ac-error { color: #933344; font-size: .8rem; display: block; margin-top: 6px !important; }
