@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/prototipos/catalogo/:path*",
-      "destination": "/prototipos/catalogo/index.html"
+      "destination": "/index.html"
     }
   ]
 }
