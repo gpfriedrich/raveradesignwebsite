@@ -72,6 +72,7 @@ export type Piece = {
   image: { src: string; alt: string; width: number; height: number }
 }
 
+// Fonte central do carrossel: adicione novas peças aqui, com imagem e descrição.
 export const pieces: Piece[] = [
   {
     name: 'Relógio Mármore Negro',

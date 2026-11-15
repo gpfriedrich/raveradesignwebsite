@@ -1,5 +1,5 @@
-import { useMemo, useRef, useState, type CSSProperties } from 'react'
-import { categories, pieces } from './content'
+import { useMemo, useRef, type CSSProperties } from 'react'
+import PiecesCarousel from './PiecesCarousel'
 import { INSTAGRAM_URL } from '../shared/contact'
 import { CATALOG_PATH } from '../catalog/catalogRoutes'
 import SiteHeader from '../shared/SiteHeader'
@@ -87,59 +87,6 @@ function Dial() {
   )
 }
 
-function CategoryIndex() {
-  const [activeId, setActiveId] = useState(categories[0].id)
-  const active = categories.find((category) => category.id === activeId) ?? categories[0]
-
-  return (
-    <div className="ts-index">
-      <ol className="ts-index-list">
-        {categories.map((category) => {
-          const isActive = category.id === activeId
-          return (
-            <li key={category.id} className={isActive ? 'is-active' : undefined}>
-              <button
-                type="button"
-                aria-expanded={isActive}
-                aria-controls={`ts-cat-${category.id}`}
-                onMouseEnter={() => setActiveId(category.id)}
-                onFocus={() => setActiveId(category.id)}
-                onClick={() => setActiveId(category.id)}
-              >
-                <span className="ts-index-numeral">{category.numeral}</span>
-                <span className="ts-index-name">{category.name}</span>
-                <span className="ts-index-items">{category.items}</span>
-              </button>
-              <div id={`ts-cat-${category.id}`} className="ts-index-detail">
-                <div>
-                  <p>{category.description}</p>
-                  {category.image && <img src={category.image.src} alt={category.image.alt} loading="lazy" decoding="async" />}
-                </div>
-              </div>
-            </li>
-          )
-        })}
-      </ol>
-
-      <div className="ts-index-preview">
-        <div className="ts-index-frame">
-          {categories.map((category) => (
-            category.image
-              ? <img key={category.id} className={category.id === activeId ? 'is-active' : undefined} src={category.image.src} alt={category.id === activeId ? category.image.alt : ''} loading="lazy" decoding="async" />
-              : (
-                <div key={category.id} className={`ts-index-placeholder${category.id === activeId ? ' is-active' : ''}`} aria-hidden={category.id !== activeId}>
-                  <span>{category.numeral}</span>
-                  <p>Fotos em breve</p>
-                </div>
-              )
-          ))}
-        </div>
-        <p className="ts-index-caption"><strong>{active.name}</strong> — {active.description}</p>
-      </div>
-    </div>
-  )
-}
-
 export default function LandingThree() {
   const rootRef = useRef<HTMLDivElement>(null)
 
@@ -161,7 +108,7 @@ export default function LandingThree() {
               </p>
               <div className="ts-hero-actions">
                 <a className="ts-button ts-button--gold" href={`${CATALOG_PATH}/`}>Eternizar uma memória</a>
-                <a className="ts-link" href="#colecao">Ver a coleção <span aria-hidden="true">↓</span></a>
+                <a className="ts-link" href={`${CATALOG_PATH}/`}>Ver o catálogo <span aria-hidden="true">→</span></a>
               </div>
             </div>
 
@@ -213,18 +160,6 @@ export default function LandingThree() {
 
         <CatalogSection />
 
-        <section id="colecao" className="ts-collection" aria-labelledby="ts-collection-title">
-          <div className="ts-container">
-            <div className="ts-section-head" data-reveal>
-              <p className="ts-kicker">Coleção</p>
-              <h2 id="ts-collection-title">Sete universos, <em>uma assinatura.</em></h2>
-            </div>
-            <div data-reveal>
-              <CategoryIndex />
-            </div>
-          </div>
-        </section>
-
         <section id="pecas" className="ts-pieces" aria-labelledby="ts-pieces-title">
           <div className="ts-container">
             <div className="ts-section-head ts-section-head--split" data-reveal>
@@ -234,18 +169,7 @@ export default function LandingThree() {
               </div>
               <a className="ts-link" href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">Ver mais no Instagram <span aria-hidden="true">↗</span></a>
             </div>
-            <ul className="ts-pieces-grid">
-              {pieces.map((piece) => (
-                <li key={piece.name} className="ts-piece" data-reveal>
-                  <div className="ts-piece-image">
-                    <img src={piece.image.src} alt={piece.image.alt} width={piece.image.width} height={piece.image.height} loading="lazy" decoding="async" />
-                  </div>
-                  <p className="ts-piece-category">{piece.category}</p>
-                  <h3>{piece.name}</h3>
-                  <p className="ts-piece-description">{piece.description}</p>
-                </li>
-              ))}
-            </ul>
+            <PiecesCarousel />
           </div>
         </section>
 

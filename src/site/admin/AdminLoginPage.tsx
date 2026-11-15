@@ -53,7 +53,7 @@ export default function AdminLoginPage() {
       if (error) {
         setAuthError('E-mail ou senha incorretos.')
       } else {
-        window.location.href = '/admin'
+        window.location.replace('/admin/catalogo')
       }
     } catch (e) {
       setAuthError('Ocorreu um erro ao tentar fazer login.')

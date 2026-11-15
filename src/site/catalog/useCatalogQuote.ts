@@ -7,10 +7,10 @@ import { useCatalogSelection } from './catalogSelectionContext'
 import { copyMessageToClipboard } from './copyMessageToClipboard'
 import { closeReservedTab, openInstagramDirect, reserveInstagramTab } from './openInstagramDirect'
 
-export const COPY_SUCCESS = 'Sua seleção foi copiada! O Instagram será aberto. Cole no Direct usando Ctrl+V ou ⌘V no computador, ou tocando e segurando para colar no celular.'
+export const COPY_SUCCESS = 'Sua seleção foi copiada! O Instagram será aberto. Basta colar a mensagem no campo de texto do Direct e enviar. Para colar, use Ctrl+V ou ⌘V no computador, ou tocando e segurando para colar no celular.'
 export const POPUP_BLOCKED = 'Sua seleção foi copiada, mas o navegador bloqueou a abertura do Instagram.'
 export const COPY_FAILURE = 'Não foi possível copiar automaticamente. Copie a mensagem abaixo e depois abra o Direct do Instagram.'
-export const MANUAL_COPY_SUCCESS = 'Mensagem copiada! Abra o Direct do Instagram e cole usando Ctrl+V ou ⌘V no computador, ou tocando e segurando para colar no celular.'
+export const MANUAL_COPY_SUCCESS = 'Mensagem copiada! Abra o Direct do Instagram. Basta colar a mensagem no campo de texto e enviar. Para colar, use Ctrl+V ou ⌘V no computador, ou tocando e segurando para colar no celular.'
 export const MANUAL_COPY_FAILURE = 'Não foi possível copiar. Selecione o texto abaixo, copie pelo menu do navegador ou usando Ctrl+C ou ⌘C e depois cole no Direct do Instagram.'
 
 export type CopyFeedback = { message: string; blocked: boolean; version: number }

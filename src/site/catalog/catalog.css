@@ -416,6 +416,15 @@
 .ts-catalog .ts-quote-action[aria-busy='true'] { background: var(--vinho); color: var(--perola); cursor: progress; }
 .ts-catalog .ts-quote-action:disabled { background: var(--papel); color: var(--grafite); border-color: var(--linha); box-shadow: none; cursor: not-allowed; opacity: 1; transform: none; }
 .ts-selection-footer .ts-quote-guidance { margin-top: 10px; font-size: .82rem; line-height: 1.5; color: var(--grafite); }
+.ts-selection-footer .ts-quote-guidance--paste {
+  padding: 12px 14px;
+  border-left: 3px solid var(--dourado);
+  background: var(--papel);
+  color: var(--vinho);
+  font-size: .9rem;
+}
+.ts-quote-guidance--paste strong { display: block; font-weight: 600; }
+.ts-quote-guidance--paste > span { display: block; margin-top: 6px; font-size: .82rem; color: var(--grafite); }
 .ts-copy-status { position: sticky; top: 0; z-index: 1; }
 .ts-copy-status.is-visible { margin-block: 16px; padding: 16px 60px 16px 16px; border: 1px solid var(--dourado); border-radius: 2px; background: var(--perola); box-shadow: 0 6px 18px rgba(36, 19, 29, .08); animation: ts-fade .2s var(--ease); }
 .ts-copy-status p { font-size: .9rem; line-height: 1.6; overflow-wrap: anywhere; }
