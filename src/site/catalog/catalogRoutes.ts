@@ -9,4 +9,4 @@ export function isCatalogPath(path: string) {
   return normalized === CATALOG_PATH || normalized.startsWith(`${CATALOG_PATH}/`)
 }
 
-export const productHref = (productId: string) => `${CATALOG_PATH}/${productId}/`
+export const productHref = (productId: string) => `${CATALOG_PATH}/${productId}`
